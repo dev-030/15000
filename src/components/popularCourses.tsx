@@ -7,9 +7,13 @@ import CourseCard from "./courseCard";
 
 export default async function PopularCourses(){
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/courses`, {
-    method: 'GET',
-  }).then((res) => res.json());
+  const data = await fetch('https://frontend.edcluster.com/api/courses',{
+      method: 'GET',
+  })
+  .then((res) => res.json())
+  .catch((error) => {
+      console.log(error, '🔴');
+  })
 
   return(
 
@@ -20,7 +24,7 @@ export default async function PopularCourses(){
       </div>
 
       <div className="grid grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
-        {res.map((course:any) => (
+        {data?.map((course:any) => (
             <Link href={`/courses/${course.id}`} key={course.id}>
               <CourseCard course={course}/>
             </Link>

@@ -1,22 +1,37 @@
-import MySessionsCard from '@/components/MySessionsCard';
+import BookedSessions from '@/components/bookedSessions';
+import { auth } from '@/lib/auth';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 
 
-export default function Sessions () {
+export default async function Sessions () {
+
+  const user = await auth();
 
 
   return (
     <div className="min-h-screen">
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">My Sessions</h2>
-        <p className="text-gray-600 text-sm">Explore expert-led courses across various skills</p>
-      </div>
+       {user ? (
+        <Suspense fallback={<p>Loading...</p>}>
+          <BookedSessions/>
+        </Suspense>
+      ):(
+        <div className="grid place-content-center min-h-screen mt-[-5.5rem]">
 
-      <Suspense fallback={<div>Loading the contents.....</div>}>
-        <MySessionsCard/>
-      </Suspense>
+          <div className="flex flex-col gap-4 place-items-center bg-white p-10 rounded-lg shadow-sm">
+            <h1 className="text-gray-500 text-base mb-2">
+              Please sign in to view your booked sessions
+            </h1>
+            <Link href="/login" className="bg-blue-500 text-white font-semibold border border-blue-500  rounded-md text-sm px-2.5 py-2">
+              Login
+            </Link>
+          </div>
+
+        </div>
+        )
+      }
 
     </div>
   );

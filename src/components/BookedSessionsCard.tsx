@@ -1,3 +1,4 @@
+'use client'
 import { time } from 'console';
 import {
   Clock,
@@ -7,7 +8,6 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
-import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -148,41 +148,44 @@ import Link from 'next/link';
 // };
 
 // Session card component
-export default async function MySessionsCard () {
-
-    const access_token = (await cookies()).get('access_token')?.value; 
+export default function BookedSessionsCard ({data}:{data:any}) {
     
-    const data = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/booked-sessions/`,{
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${access_token}`
-        }
-    }).then((res) => res.json());
 
 
-    const exampleData = {
-        "count": 2,
-        "next": null,
-        "previous": null,
-        "results": [
-            {
-                "id": "9d18fdb8-2206-4c4e-a273-9eba0c219c3c",
-                "mentor": "d1d072fe-af6b-4323-b29d-26f298fb08ae",
-                "scheduled_at": "2025-05-26T14:00:00+06:00",
-                "duration_min": 60,
-                "status": "H"
-            },
-            {
-                "id": "43e9b12e-4ed9-4dc8-ab96-3fd63e2b10c3",
-                "mentor": "d1d072fe-af6b-4323-b29d-26f298fb08ae",
-                "scheduled_at": "2025-05-26T14:00:00+06:00",
-                "duration_min": 60,
-                "status": "R"
-            }
-        ]
-    }
 
+
+
+
+
+
+
+
+
+
+  // make empty page for sessions or login page look like the empty mycourses page. with big icons in the middle and texts on the bottom.
+  // fix booked sessions card implement all the features in it. also from the mentor implement the rescheduling 
+  // feature and also make it work from the client also. also make the data update automatically when mentor accepts
+  // send an notification to the user when mentor accepts it
+  // when an normal user becomes mentor updat their refresh and access token with role value
+  // make the mentor dashboard functions fully functional also the details page needs more data so add options to add them from the mentors dashboard. 
+  // add input field when booking a new session
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    console.log(data.results)
 
     const timeRemaining = (targetTime: string) => {
       const now = new Date(); // Local time
@@ -216,7 +219,6 @@ export default async function MySessionsCard () {
       ...(timeZone ? { timeZone } : {}),
     });
 
-    console.log(data?.results)
 
   return (
     <>
