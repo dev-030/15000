@@ -147,6 +147,7 @@
 import React from 'react';
 import BookingModal from "@/components/modal";
 import { Book } from 'lucide-react';
+import { apiService } from '@/lib/actions/api';
 
 
 
@@ -159,17 +160,18 @@ export default async function MentorSessionDetails({ params }: { params: Promise
     cache: 'no-cache',
   }).then((res) => res.json());
 
+  // const response = await apiService.get(`/client/gig-detail/?consultancy_id=${slug}`)
 
-  console.log(data);
+
+  console.log(data , 'from response 🟢')
 
   
+
   return (
     <div className="flex justify-center min-h-screen">
-      <div className="w-full max-w-6xl flex flex-col gap-8"> {/* Main container for all content */}
+      <div className="w-full max-w-6xl flex flex-col gap-8"> 
 
-        {/* --- Course Details Section with Sticky Card --- */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Course Details (Left Column) */}
           <div className="flex-grow lg:w-2/3 bg-white rounded-lg shadow-md p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-6">React Course: Mastering the Basics</h1>
             <p className="text-gray-700 leading-relaxed mb-4">
@@ -248,9 +250,9 @@ export default async function MentorSessionDetails({ params }: { params: Promise
 
           
 
-          {/* Sticky Buy Now Card (Right Column) */}
-          <div className="lg:w-1/3 relative"> {/* 'relative' makes this the containing block for sticky */}
-            <div className="bg-white rounded-lg shadow-lg p-6 text-center sticky top-[4.4rem]"> {/* sticky and top-5 for offset */}
+          <div className="lg:w-1/3 relative"> 
+            <div className="bg-white rounded-lg shadow-lg p-6 text-center sticky top-[4.4rem]"> 
+
               <h3 className="text-3xl font-bold text-gray-800 mb-7">Book Your Session</h3>
 
               <BookingModal timeSlots={data.days} slug={data.id}/>
@@ -260,8 +262,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
 
         </div>
 
-        {/* --- Remaining Sections (Non-Sticky) --- */}
-        <div className="flex-grow lg:w-full"> {/* These sections will be full width, below the two-column layout */}
+        <div className="flex-grow lg:w-full"> 
           <div className="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">About the Instructor</h2>
             <div className="flex items-center gap-6 mt-6">

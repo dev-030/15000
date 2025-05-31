@@ -3,14 +3,12 @@ import Link from "next/link";
 
 
 import { Search, Star, ChevronLeft, ChevronRight, Landmark } from 'lucide-react';
-import axiosSecureClient from "@/lib/axiosClient";
 import axios from "axios";
 
 export default async function MyCourses() {
 
 
 
-  const { data } = await axiosSecureClient.get('/client/gig-list/');
 
   
   const courses = [

@@ -22,7 +22,7 @@ const links: LinkItem[] = [
     { name: "Mentorships", href: "/mentors", icon: GraduationCap },
     { name: "My Courses", href: "/my-courses", icon: MonitorPlay },
     { name: "Booked Sessions", href: "/sessions", icon: CalendarCheck },
-    { name: "Saved", href: "/", icon: Bookmark },
+    { name: "Saved", href: "/saved", icon: Bookmark },
     { name: "Become a Mentor", href: "/onboarding", icon: SquareUserRound },
 
 ];

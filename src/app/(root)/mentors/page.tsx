@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import MentorFilters from '@/components/MentorFilters';
+import MentorFilters from '@/components/mentorFilters';
 import MentorList from '@/components/MentorList';
 import TopMentors from '@/components/TopMentors';
 import MentorCardsSkeleton from '@/components/MentorCardsSkeletorn';
@@ -7,36 +7,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 
-interface SearchParams {
-  category?: string;
-  sortBy?: string;
-  timeFilter?: string;
-  search?: string;
-}
 
-const DEFAULTS: Required<SearchParams> = {
-  category: 'All',
-  sortBy: 'Recommended',
-  timeFilter: 'All',
-  search: '',
-};
 
-export default async function MentorsPage({ searchParams}: { searchParams: Promise<SearchParams> | SearchParams }) {
+export default async function MentorsPage({ searchParams }: any) {
  
   const params = await searchParams;
 
-  const hasAnyParam = Object.values(params).some(
-    (v) => v !== undefined && v !== ''
-  );
-
-  const {category, sortBy, timeFilter, search}: Required<SearchParams> = hasAnyParam ? {
-    category: params.category ?? DEFAULTS.category,
-    sortBy: params.sortBy ?? DEFAULTS.sortBy,
-    timeFilter: params.timeFilter ?? DEFAULTS.timeFilter,
-    search: params.search ?? DEFAULTS.search,
-  } : DEFAULTS;
-
-  
   return (
     <main className="min-h-screen">
 
@@ -46,12 +22,7 @@ export default async function MentorsPage({ searchParams}: { searchParams: Promi
       </div>
 
       <Suspense  fallback={<p>Loading filters…</p>}>
-        <MentorFilters 
-          initialCategory={category}
-          initialSortBy={sortBy}
-          initialTimeFilter={timeFilter}
-          initialSearch={search}
-        />
+        <MentorFilters searchParams={params}/>
       </Suspense>
 
       <Suspense  fallback={<MentorCardsSkeleton/>}>
@@ -60,7 +31,7 @@ export default async function MentorsPage({ searchParams}: { searchParams: Promi
 
 
       <Suspense fallback={<MentorCardsSkeleton/>}>
-        <MentorList category={category} sortBy={sortBy} timeFilter={timeFilter} search={search} />
+        <MentorList params={params} />
       </Suspense>
 
 

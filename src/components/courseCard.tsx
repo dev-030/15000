@@ -27,19 +27,24 @@ const Rating = ({ score, reviews }:any) => {
 
 export default function CourseCard ({ course }:any){
   return (
-    <div className="max-w-72 rounded-lg overflow-hidden border border-gray-200 bg-white cursor-pointer flex flex-col h-full">
-
-      <div className="w-full h-40 relative">
-        <Image src={course.image} alt={course.title} fill className="object-cover" />
+     <div className="max-w-full rounded-md overflow-hidden border border-gray-200 bg-white shadow-xs hover:shadow-sm transition-shadow duration-300 cursor-pointer flex flex-col h-full">
+      
+      <div className="relative w-full aspect-[16/9]">
+        <Image
+          src={course.image}
+          alt={course.title}
+          fill
+          className="object-cover"
+        />
       </div>
 
-      <div className="px-3 py-3 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-800 text-[16px] my-1">{course.title}</h3>
-        <p className="text-sm text-gray-600 mb-1">{course.instructor}</p>
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="font-semibold text-gray-700 text-base line-clamp-2">{course.title}</h3>
+        <p className="text-sm text-gray-500 mt-1">{course.instructor}</p>
 
-        <div className="mt-auto pt-2 flex items-center justify-between text-gray-500">
+        <div className="mt-auto pt-4 flex items-center justify-between text-gray-600 text-sm">
           <Rating score={course.rating} reviews={course.reviews} />
-          <div className="font-md text-md">{course.price.toFixed(2)}$</div>
+          <span className="font-semibold text-gray-800">${course.price.toFixed(2)}</span>
         </div>
       </div>
     </div>

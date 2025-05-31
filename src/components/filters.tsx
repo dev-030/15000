@@ -8,7 +8,7 @@ import { Search } from 'lucide-react';
 
 
 
-export default function MentorFilters({initialCategory, initialSortBy, initialTimeFilter, initialSearch}:any) {
+export default function Filters({initialCategory, initialSortBy, initialTimeFilter, initialSearch, categories, sorting, midFilter}:any) {
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -18,17 +18,6 @@ export default function MentorFilters({initialCategory, initialSortBy, initialTi
   const [timeFilter, setTimeFilter] = useState(initialTimeFilter);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
 
-  const categories = [
-    { id: 'all', name: 'All' },
-    { id: 'uxui', name: 'UX/UI' },
-    { id: 'freelancing', name: 'Freelancing' },
-    { id: 'career-guidance', name: 'Career Guidance' },
-    { id: 'html5', name: 'HTML5' },
-    { id: 'youtube', name: 'YouTube Growth' },
-    { id: 'animation', name: 'Animation' },
-    { id: 'coding', name: 'Coding Help' },
-    { id: 'business', name: 'Business' },
-  ];
 
   // Update URL when filters change
   const updateFilters = (newFilters) => {
@@ -101,6 +90,7 @@ export default function MentorFilters({initialCategory, initialSortBy, initialTi
 
   return (
     <div className="mb-6">
+      
       {/* Category Tabs */}
       <div className="overflow-x-auto pb-4">
         <div className="flex flex-wrap space-x-2 space-y-2">
@@ -131,39 +121,25 @@ export default function MentorFilters({initialCategory, initialSortBy, initialTi
             onChange={(e) => handleSortChange(e.target.value)}
             className="border border-gray-300 rounded-md text-sm py-1.5"
           >
-            <option>Recommended</option>
-            <option>Newest</option>
-            <option>Highest Rated</option>
-            <option>Most Popular</option>
+            {sorting.map(sorting => (
+              <option key={sorting.id} value={sorting.id}>{sorting.name}</option>
+            ))}          
           </select>
         </div>
 
-        {/* Time Filter */}
+        {/* Mid Filter */}
         <div className="flex gap-1 bg-gray-50 p-1 rounded-md overflow-hidden text-gray-600">
-          <button 
-            onClick={() => handleTimeFilterChange('All')}
-            className={`py-1.5 px-4 text-sm font-medium cursor-pointer rounded-md ${
-              timeFilter === 'All' ? 'bg-white text-blue-500' : 'bg-gray-50 hover:bg-gray-100'
-            }`}
-          >
-            Any time
-          </button>
-          <button 
-            onClick={() => handleTimeFilterChange('Today')}
-            className={`py-1.5 px-4 text-sm font-medium cursor-pointer rounded-md ${
-              timeFilter === 'Today' ? 'bg-white text-blue-500' : 'bg-gray-50 hover:bg-gray-100'
-            }`}
-          >
-            Today
-          </button>
-          <button 
-            onClick={() => handleTimeFilterChange('This week')}
-            className={`py-1.5 px-4 text-sm font-medium cursor-pointer rounded-md ${
-              timeFilter === 'This week' ? 'bg-white text-blue-500' : 'bg-gray-50 hover:bg-gray-100'
-            }`}
-          >
-            This week
-          </button>
+          {midFilter.map(midFilter => (
+            <button 
+              key={midFilter.id}
+              onClick={() => handleTimeFilterChange(midFilter.id)}
+              className={`py-1.5 px-4 text-sm font-medium cursor-pointer rounded-md ${
+                timeFilter === midFilter.id ? 'bg-white text-blue-500' : 'bg-gray-50 hover:bg-gray-100'
+              }`}
+            >
+              {midFilter.name}
+            </button>
+          ))}
         </div>
         
         {/* Search */}

@@ -5,21 +5,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
  
-export async function saveData() {
 
-    const cookie = (await cookies()).get("access_token")?.value;
-
-    // https://server.edcluster.com/check-cookie
-
-
-    const res  = await axios.get("https://v1.edcluster.com/auth/test/",{
-      headers: {
-        "Authorization": `Bearer ${cookie}`,
-      },
-    });
-
-
-  // you can do DB actions here
+export const giveToken = async () => {
+  return (await cookies()).get('access_token')?.value;
 }
 
 
@@ -63,30 +51,13 @@ export async function BookSchedule({selectedDate, selectedTime, slug}:{selectedD
   }).then((res) => res.json());
 
   console.log(res, '🟢');
-  // redirect('/sessions');
 
-  // console.log('Booked', {selectedDate, selectedTime, slug});
 }
 
 
 
 
 export async function GetCourses(){
-  // first check in the database which collections the user has access to. then get those collection ids.
-//   const url = 'https://video.bunnycdn.com/library/414419/collections/3a8305d7-903e-41eb-9e4a-ea8b1dc429cf';
-//   const options = {
-//     method: 'GET',
-//     headers: {
-//       accept: 'application/json',
-//       AccessKey: 'dd26edbc-8b47-46ee-923d773eb34b-a3b9-4e64'
-//     }
-//   };
-
-// const val = await fetch(url, options)
-//   .then(res => res.json())
-//   .then(json => console.log(json))
-//   .catch(err => console.error(err));
-
 
   const courses = [
     {

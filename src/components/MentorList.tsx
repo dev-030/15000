@@ -1,3 +1,4 @@
+import { apiService } from "@/lib/actions/api";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -5,15 +6,16 @@ import Link from "next/link";
 // const InstructorCard = dynamic(() => import('@/components/instructorCard'));
 
 
-export default async function MentorList({category, sortBy, timeFilter, search}:any) {
+export default async function MentorList({params}:any) {
         
 
-    console.log(category, sortBy, timeFilter, search, '🔴');
+    // console.log(category, sortBy, timeFilter, search, '🔴');
 
 
-    const data = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/gig-list/`, {
-        method: 'GET',
-    }).then((res) => res.json());
+    const data = await apiService.get<[]>('/client/gig-list/')
+    .catch(error => {
+        console.log(error, '🔴');
+    });
 
 
     return (
@@ -21,8 +23,8 @@ export default async function MentorList({category, sortBy, timeFilter, search}:
 
             <h1 className="text-xl text-gray-700 font-bold mb-4 mt-10">Book Mentors</h1>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                {data.map((instructor:any) => (
+            <div className="grid grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
+                {data?.map((instructor:any) => (
                    <div key={instructor.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 w-fit transition duration-300">
 
                         <div>
@@ -54,7 +56,7 @@ export default async function MentorList({category, sortBy, timeFilter, search}:
 
                                 <div className="flex flex-col items-center gap-0.5">
                                     <p className="text-xs text-gray-500">TYPE</p>
-                                    <p className="text-sm text-gray-700">1-on-1</p>
+                                    <p className="text-sm text-gray-700 text-">1-on-1</p>
                                 </div>
                             </div>
 

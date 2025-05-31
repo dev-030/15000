@@ -36,10 +36,10 @@ export default function TopMentors() {
   ];
 
   return (
-    <div className="mb-8">
-      <h2 className="text-xl font-bold text-gray-700 mb-4">Top Mentors</h2>
+    <div className="mt-4">
+      <h2 className="text-xl font-semibold text-gray-700 mb-4">Top Mentors</h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
         {topMentors.map((mentor) => (
           <Link href={`/profile/${mentor.id}`} key={mentor.id} className="text-center bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
             <div className="relative mb-3">
@@ -60,7 +60,7 @@ export default function TopMentors() {
               {mentor.title}
             </p>
 
-            <p className="text-gray-500 text-xs leading-relaxed">
+            <p className="text-gray-500 text-xs leading-relaxed line-clamp-3">
               {mentor.description}
             </p>
           </Link>

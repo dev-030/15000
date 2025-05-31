@@ -9,7 +9,7 @@ export default function AppLayout({children}:{children:React.ReactNode}){
 
     const pathname = usePathname();
 
-    const showSidebar = pathname === '/' || pathname === '/courses' || pathname === '/mentors' || pathname === '/my-courses' || pathname === '/sessions';
+    const showSidebar = pathname === '/' || pathname === '/courses' || pathname === '/mentors' || pathname === '/my-courses' || pathname === '/sessions' || pathname === '/saved';
 
     return(
         <div className="">
@@ -27,11 +27,11 @@ export default function AppLayout({children}:{children:React.ReactNode}){
                 <main className={`flex-1 ${showSidebar ? 'ml-60' : 'ml-0'} transition-all duration-100 bg-gray-50`}>
                     <div className="p-4 container mx-auto">
                         {children}
-                    </div>
+                    </div>        
                 </main>
 
             </div>
-
+  
         </div>
         
     )
