@@ -17,68 +17,72 @@ export default async function MyCoursesComponent(){
     })
     .then((res) => res.json())
     .catch((error) => {
-        console.log(error, '🔴');
+        console.error({"ERROR":error.message});
     })
       
       
   return(
     <div>
-      
-        <div className="mb-5">
-          <h2 className="text-2xl font-bold text-gray-900">My Courses</h2>
-          <p className="text-gray-600 text-sm">Access your learning anytime</p>
-        </div>
 
         {data ? (
-            <div className="grid grid-cols-1 min-[830px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
-                {data?.map((course:any) => (
-                    <div key={course.id} className="bg-white rounded-lg shadow p-2 border border-gray-200">
-                        <div className="relative">
-                            <img
-                            src={course.image}
-                            alt={course.title}
-                            className="w-full h-40 object-cover rounded"
-                            />
-                            <span className={`absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-full ${
-                            course.status === 'In Progress'
-                                ? 'bg-green-200 text-green-800'
-                                : course.status === 'New Started'
-                                ? 'bg-yellow-200 text-yellow-800'
-                                : course.status === 'Completed'
-                                ? 'bg-blue-200 text-blue-800'
-                                : 'bg-gray-200 text-gray-800'
-                            }`}>
-                            {course.status}
-                            </span>
-                        </div>
-                        <h3 className="mt-2 text-md font-semibold">
-                            {course.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 pt-2">By {course.instructor}</p>
-                        <div className="mt-2 text-sm text-gray-500">
-                            {course.status === 'Completed' && course.completedAt && (
-                            <p>Completed: {course.completedAt}</p>
-                            )}
-                            {course.status !== 'Completed' && course.lastAccessed && (
-                            <p>Last accessed: {course.lastAccessed}</p>
-                            )}
-                        </div>
-                        <div className="mt-2">
-                            <div className="bg-gray-200 h-2 rounded-full">
-                            <div
-                                className="bg-blue-500 h-2 rounded-full"
-                                style={{ width: `${course.progress}%` }}
-                            ></div>
+            <div>
+
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900">My Courses</h2>
+                    <p className="text-gray-600 text-sm">Access your learning anytime</p>
+                </div>
+
+                <div className="grid grid-cols-1 min-[830px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
+                    {data?.map((course:any) => (
+                        <div key={course.id} className="bg-white rounded-lg shadow p-2 border border-gray-200">
+                            <div className="relative">
+                                <img
+                                src={course.image}
+                                alt={course.title}
+                                className="w-full h-40 object-cover rounded"
+                                />
+                                <span className={`absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-full ${
+                                course.status === 'In Progress'
+                                    ? 'bg-green-200 text-green-800'
+                                    : course.status === 'New Started'
+                                    ? 'bg-yellow-200 text-yellow-800'
+                                    : course.status === 'Completed'
+                                    ? 'bg-blue-200 text-blue-800'
+                                    : 'bg-gray-200 text-gray-800'
+                                }`}>
+                                {course.status}
+                                </span>
                             </div>
+                            <h3 className="mt-2 text-md font-semibold">
+                                {course.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 pt-2">By {course.instructor}</p>
+                            <div className="mt-2 text-sm text-gray-500">
+                                {course.status === 'Completed' && course.completedAt && (
+                                <p>Completed: {course.completedAt}</p>
+                                )}
+                                {course.status !== 'Completed' && course.lastAccessed && (
+                                <p>Last accessed: {course.lastAccessed}</p>
+                                )}
+                            </div>
+                            <div className="mt-2">
+                                <div className="bg-gray-200 h-2 rounded-full">
+                                <div
+                                    className="bg-blue-500 h-2 rounded-full"
+                                    style={{ width: `${course.progress}%` }}
+                                ></div>
+                                </div>
+                            </div>
+                            <button className="mt-2 px-4 py-1 text-sm bg-blue-600 text-white rounded">
+                                {course.status === 'Completed' ? 'Review' : course.progress > 0 ? 'Continue' : 'Start'}
+                            </button>
                         </div>
-                        <button className="mt-2 px-4 py-1 text-sm bg-blue-600 text-white rounded">
-                            {course.status === 'Completed' ? 'Review' : course.progress > 0 ? 'Continue' : 'Start'}
-                        </button>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
+
         ) : (
-            <div className="text-center mt-14">
+            <div className="text-center mt-20">
 
                 <div className="flex flex-col items-center justify-center gap-2">
                     <div className="text-5xl text-blue-500">         

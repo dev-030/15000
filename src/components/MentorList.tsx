@@ -14,13 +14,13 @@ export default async function MentorList({params}:any) {
 
     const data = await apiService.get<[]>('/client/gig-list/')
     .catch(error => {
-        console.log(error, '🔴');
+        console.error({"ERROR":error.message});
     });
-
+    
 
     return (
         <div>
-
+            
             <h1 className="text-xl text-gray-700 font-bold mb-4 mt-10">Book Mentors</h1>
 
             <div className="grid grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">

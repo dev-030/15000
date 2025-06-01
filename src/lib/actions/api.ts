@@ -57,7 +57,7 @@ class RestApi {
             ...fetchOptions,
             headers,
         });
-
+        
         if (!response.ok) {
             throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         }

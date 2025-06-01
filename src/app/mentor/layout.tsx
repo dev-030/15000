@@ -1,6 +1,5 @@
 import SideBar from "@/components/sideBar";
 import { auth } from "@/lib/auth";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 

@@ -1,31 +1,45 @@
+import SavedContents from "@/components/savedContents";
+import { auth } from "@/lib/auth";
+import { ArrowRight, BookmarkCheck } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 
 
 
 
 export default async function Saved() {
 
+    const user = await auth();
 
     return (
-        <div className="flex justify-center min-h-screen">        
-            <div className="w-full max-w-6xl flex flex-col gap-8"> 
-                <div className="flex flex-col lg:flex-row gap-8">                
-                    <div className="flex-grow lg:w-2/3 bg-white rounded-lg shadow-md p-8">                
-                        <h1 className="text-3xl font-bold text-gray-800 mb-6">Saved Courses</h1>
-                        <p className="text-gray-700 leading-relaxed mb-4">
-                            Browse courses you've saved for later
-                        </p>
-                        <p className="text-gray-700 leading-relaxed mb-4">
-                            You can save courses for later viewing or sharing
-                        </p>
-                        <p className="text-gray-700 leading-relaxed mb-4">
-                            Saved courses will be available for viewing and sharing
-                        </p>
-                        <p className="text-gray-700 leading-relaxed mb-4">
-                            This feature is currently in beta and subject to change
-                        </p>
+        <div className="min-h-screen">
+        
+               {user ? (
+                <Suspense fallback={<p>Loading...</p>}>
+                  <SavedContents/>
+                </Suspense>
+              ):(
+                <div className="grid place-content-center min-h-screen mt-[-5.5rem]">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="text-5xl text-blue-500">         
+                      <BookmarkCheck className="h-20 w-20 text-blue-500 mb-4" />
                     </div>
+                    <p className="text-lg font-semibold mb-2">
+                      Sign in to view your saved contents
+                    </p>
+                    <p className="text-sm text-gray-600 mb-4 w-2/3 text-center">
+                      Access your saved courses and sessios to continue your learning journey.
+                    </p>
+                    <Link href={`/login`} className="group px-4 py-2 flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-3xl font-medium overflow-hidden relative border border-blue-600">
+                      <span className="relative z-10">Sign In</span>
+                      <ArrowRight size={16} className="relative z-10 transition-transform group-hover:translate-x-1" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                    </Link>
+                  </div>
                 </div>
+                )
+              }
+        
             </div>
-        </div>
     );
 }

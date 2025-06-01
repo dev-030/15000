@@ -15,7 +15,7 @@ export async function BecomeMentor(data:any){
 
   const cookie = (await cookies()).get("access_token")?.value;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/mentor/become-mentor/`,{
+  const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/mentor/become-mentor/`,{
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
@@ -24,16 +24,39 @@ export async function BecomeMentor(data:any){
     },
   })
 
-  if(res.status === 200){
-    redirect('/mentor/dashboard');
-  }
+  const res = await response.json();
+
+  (await cookies()).set("refresh_token", res.refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    ...(process.env.NODE_ENV === 'production' && {
+      domain: '.edcluster.com',
+    }),
+    expires: new Date(Date.now() + 1000 * 60 * res.refresh_token_expires_at)
+  });
+
+
+  (await cookies()).set("access_token", res.access_token,{
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    ...(process.env.NODE_ENV === 'production' && {
+      domain: '.edcluster.com',
+    }),
+    expires: new Date(Date.now() + 1000 * 60 * res.access_token_expires_at) 
+  });
+
+  return response.status;
 
 }
 
 
 
 
-export async function BookSchedule({selectedDate, selectedTime, slug}:{selectedDate:any, selectedTime:any, slug:string}){
+export async function BookSchedule({selectedDate, selectedTime, slug, note}:{selectedDate:any, selectedTime:any, slug:string, note:string}){
 
   const cookie = (await cookies()).get("access_token")?.value;
 

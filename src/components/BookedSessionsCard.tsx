@@ -162,7 +162,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
 
-  // make empty page for sessions or login page look like the empty mycourses page. with big icons in the middle and texts on the bottom.
+
   // fix booked sessions card implement all the features in it. also from the mentor implement the rescheduling 
   // feature and also make it work from the client also. also make the data update automatically when mentor accepts
   // send an notification to the user when mentor accepts it
@@ -221,7 +221,13 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
   return (
-    <>
+    <div>
+
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Booked Sessions</h2>
+        <p className="text-gray-600 text-sm">Access your booked sessions</p>
+      </div>
 
 
 
@@ -329,7 +335,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
         ) : null}
       </div> */}
 
-    </>
+    </div>
   );
 };
 

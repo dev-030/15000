@@ -22,8 +22,6 @@ export default function Filters({initialCategory, initialSortBy, initialTimeFilt
   // Update URL when filters change
   const updateFilters = (newFilters) => {
     const params = new URLSearchParams(searchParams);
-
-    console.log(params,'params');
     
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value && value !== 'All') {

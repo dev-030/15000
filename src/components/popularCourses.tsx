@@ -12,7 +12,7 @@ export default async function PopularCourses(){
   })
   .then((res) => res.json())
   .catch((error) => {
-      console.log(error, '🔴');
+    console.error({"ERROR":error.message});
   })
 
   return(

@@ -14,7 +14,7 @@ export default async function CourseList({params}:any){
     })
     .then((res) => res.json())
     .catch((error) => {
-        console.log(error, '🔴');
+        console.error({"ERROR":error.message});
     })
 
 

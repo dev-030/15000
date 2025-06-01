@@ -1,5 +1,6 @@
 import BookedSessions from '@/components/bookedSessions';
 import { auth } from '@/lib/auth';
+import { ArrowBigRight, ArrowRight, CalendarDays, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -19,16 +20,22 @@ export default async function Sessions () {
         </Suspense>
       ):(
         <div className="grid place-content-center min-h-screen mt-[-5.5rem]">
-
-          <div className="flex flex-col gap-4 place-items-center bg-white p-10 rounded-lg shadow-sm">
-            <h1 className="text-gray-500 text-base mb-2">
-              Please sign in to view your booked sessions
-            </h1>
-            <Link href="/login" className="bg-blue-500 text-white font-semibold border border-blue-500  rounded-md text-sm px-2.5 py-2">
-              Login
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="text-5xl text-blue-500">         
+              <CalendarDays className="h-20 w-20 text-blue-500 mb-4" />
+            </div>
+            <p className="text-lg font-semibold mb-2">
+              Sign in to view your sessions
+            </p>
+            <p className="text-sm text-gray-600 mb-4 w-2/3 text-center">
+              Please sign in to view your bookied sessions and hop on the learning journey.
+            </p>
+            <Link href={`/login`} className="group px-4 py-2 flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-3xl font-medium overflow-hidden relative border border-blue-600">
+              <span className="relative z-10">Sign In</span>
+              <ArrowRight size={16} className="relative z-10 transition-transform group-hover:translate-x-1" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
             </Link>
           </div>
-
         </div>
         )
       }

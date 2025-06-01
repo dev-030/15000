@@ -3,9 +3,8 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconType } from "react-icons";
-import { RxDashboard } from "react-icons/rx";
-import { IoBookOutline } from "react-icons/io5";
-import { GraduationCap, House, MonitorDot, MonitorPlay, Radio, TvMinimalPlay, BookText, CalendarCheck, Bookmark, User, SquareUserRound } from "lucide-react";
+import { GraduationCap, House, MonitorPlay, BookText, CalendarCheck, Bookmark, SquareUserRound } from "lucide-react";
+import { useClientSession } from "@/context/sessionProvider";
 
 
 
@@ -13,6 +12,7 @@ type LinkItem = {
     name: string;
     href: string;
     icon: IconType;
+    requiresAuth?: boolean;
 };
 
 
@@ -23,20 +23,29 @@ const links: LinkItem[] = [
     { name: "My Courses", href: "/my-courses", icon: MonitorPlay },
     { name: "Booked Sessions", href: "/sessions", icon: CalendarCheck },
     { name: "Saved", href: "/saved", icon: Bookmark },
-    { name: "Become a Mentor", href: "/onboarding", icon: SquareUserRound },
-
+    { name: "Become a Mentor", href: "/onboarding", icon: SquareUserRound, requiresAuth: true }
 ];
 
 export default function RootSideBar(){
 
+    const user = useClientSession();
+
     const pathname = usePathname();
+
+
+    const visibleLinks = links.filter(link => {
+        if (link.requiresAuth) {
+            return user; 
+        }
+        return true; 
+    });
 
     return(
         <>
             <aside className="w-60 px-3 pt-4">
 
                 <nav className="flex flex-col gap-2">
-                   {links.map((link) => (
+                   {visibleLinks.map((link) => (
                         <Link 
                         key={link.name}
                         href={link.href}
