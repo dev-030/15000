@@ -3,10 +3,11 @@
 import axios from "axios";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { bookingSchema } from "../schema";
 
  
 
-export const giveToken = async () => {
+export const accessToken = async () => {
   return (await cookies()).get('access_token')?.value;
 }
 
@@ -60,20 +61,33 @@ export async function BookSchedule({selectedDate, selectedTime, slug, note}:{sel
 
   const cookie = (await cookies()).get("access_token")?.value;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/book-consultancy/`,{
+  const result = bookingSchema.safeParse({ 
+    date: selectedDate,
+    time: selectedTime,
+    slug: slug,
+    note: note
+  });
+ 
+  if (!result.success) {
+    return {
+      success: false,
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/book-consultancy/`,{
     method: 'POST',
     body: JSON.stringify({
       "consultancy_id": slug,
       "selectedDate": selectedDate,
-      "selectedTime": selectedTime
+      "selectedTime": selectedTime,
+      "note": note
     }),
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${cookie}`,
     },
   }).then((res) => res.json());
-
-  console.log(res, '🟢');
 
 }
 

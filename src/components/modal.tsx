@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { BookSchedule } from '@/lib/actions/actions';
 import { useClientSession } from '@/context/sessionProvider';
-import Link from 'next/link';
-import { Calendar, CalendarDays, ClockFading, Globe, User, Video, X } from 'lucide-react';
-
+import { ArrowRight, CalendarDays, Check, ClockFading, Globe, Video, X } from 'lucide-react';
+import { date, z } from 'zod';
+import { useRouter } from 'next/navigation';
+import { bookingSchema } from '@/lib/schema';
 
 
 export function getNextWeekdayStrings( dayStrings: string | string[], countPerDay: number = 5): string[] {
@@ -60,20 +61,16 @@ function getDayOfWeek(dateString: string): string {
 function generateCalendarGrid(availableDates: string[]): Array<{ date: string | null, isAvailable: boolean }> {
   if (availableDates.length === 0) return [];
   
-  // Get the first and last dates to determine the range
   const firstDate = dayjs(availableDates[0]);
   const lastDate = dayjs(availableDates[availableDates.length - 1]);
   
-  // Find the start of the week for the first date
-  const startOfWeek = firstDate.startOf('week'); // This will be Sunday
+  const startOfWeek = firstDate.startOf('week'); 
   
-  // Find the end of the week for the last date
-  const endOfWeek = lastDate.endOf('week'); // This will be Saturday
+  const endOfWeek = lastDate.endOf('week'); 
   
   const grid: Array<{ date: string | null, isAvailable: boolean }> = [];
   const availableDateSet = new Set(availableDates);
   
-  // Generate all days from start of first week to end of last week
   let currentDate = startOfWeek;
   while (currentDate.isBefore(endOfWeek) || currentDate.isSame(endOfWeek, 'day')) {
     const dateString = currentDate.format('YYYY-MM-DD');
@@ -92,6 +89,7 @@ function generateCalendarGrid(availableDates: string[]): Array<{ date: string | 
 
 
 
+
 export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_week: string, slug: string, time_blocks: { start_time: string }[] }[] , slug:string}) {
 
 
@@ -99,15 +97,15 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
   const numberOfDaysAhead = 3;
   // ---------------------------------------------------
 
-  const [open, setOpen] = useState(!false);
+  const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState("");
   const user = useClientSession();
   const [dates, setDates] = useState<string[]>([]);
-  const [step, setStep] = useState("select");
+  const [step, setStep] = useState("select" as "select" | "input" | "confirmed");
   const [note, setNote] = useState("");
-
-
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
 
   function formatTime12Hour(time: string): string {
@@ -121,26 +119,44 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
     });
   }
 
+  const formattedTime = () => {
+    const date = new Date(selectedDate + " " + selectedTime);
+    return date.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+
 
   useEffect(() => {
-    const dayNames = timeSlots.map(slot => slot.day_of_week);
-    setDates(getNextWeekdayStrings(dayNames, numberOfDaysAhead)); 
+    if (timeSlots && timeSlots.length > 0) {
+      const dayNames = timeSlots.map(slot => slot.day_of_week);
+      setDates(getNextWeekdayStrings(dayNames, numberOfDaysAhead));
+    }
   }, [timeSlots]);
 
 
-  useEffect(() => {
-    document.body.classList.toggle('overflow-hidden', open);
-    return () => { document.body.classList.remove('overflow-hidden'); };
-  }, [open]);
+
+  // useEffect(() => {
+  //   document.body.classList.toggle('overflow-hidden', open);
+  //   return () => { document.body.classList.remove('overflow-hidden'); };
+  // }, [open]);
 
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    if (open) window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [open]);
+  // useEffect(() => {
+  //   const handler = (e: KeyboardEvent) => {
+  //     if (e.key === 'Escape') {
+  //       setOpen(false)
+  //     };
+  //   };
+  //   if (open) window.addEventListener('keydown', handler);
+  //   return () => window.removeEventListener('keydown', handler);
+  // }, [open]);
 
 
   function getTimeBlocksForDate(date: string): string[] {
@@ -151,6 +167,34 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
 
 
 
+
+  const handleSubmit = async() => {
+
+    setLoading(true);
+
+    const result = bookingSchema.safeParse({
+      date: selectedDate,
+      time: selectedTime,
+      slug: slug,
+      note: note
+    })
+
+    if (!result.success) {
+      const errorMessages = result.error.errors.map((e) => e.message).join("\n");
+      alert(errorMessages); 
+      return;
+    }
+
+    BookSchedule({ selectedDate, selectedTime, slug, note }).then(() => {
+      setStep("confirmed");
+    }).catch((error) => {
+      console.error(error);
+      alert("Something went wrong. Please try again later.");
+    }).finally(() => {
+      setLoading(false);
+    });
+
+  }
   
 
 
@@ -167,9 +211,22 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
 
       {open && (
         user ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md p-4" onClick={() => setOpen(false)}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
 
             <div className="rounded-xl flex shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all duration-300 ease-out" onClick={e => e.stopPropagation()}>
+
+              <div className='absolute top-3.5 right-3.5 border border-gray-400 text-gray-800 hover:text-white hover:bg-blue-600 hover:border-blue-600 cursor-pointer rounded-full p-1'
+              onClick={() => {
+                setOpen(false)
+                setStep("select");
+                setSelectedDate(null);
+                setSelectedTime("");
+                setNote("");
+              }} 
+              >
+                <X size={16} />
+              </div>
+              
       
               {/* Left side*/}
               <div className="w-2/5 bg-gradient-to-br from-slate-50 to-slate-50 p-5 border-r border-gray-100">
@@ -191,7 +248,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                   <div className='flex items-center gap-3'>
                     <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" alt="React Course" className="w-9 h-9 rounded-full" />
                     <div className='flex flex-col items-start gap-0.5'>
-                      <p className='text-xs text-gray-600'>Mentor</p>
+                      <p className='text-xs text-gray-600 font-medium'>Mentor</p>
                       <h1 className='text-xs font-medium text-gray-800'>Dr. Jane Smith</h1>
                     </div>
                   </div>
@@ -201,7 +258,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                       <ClockFading size={18} className="text-blue-600" />
                     </div>
                     <div className='flex flex-col items-start gap-0.5'>
-                      <div className="text-xs text-gray-600">Duration</div>
+                      <div className="text-xs text-gray-600 font-medium">Duration</div>
                       <div className="text-xs font-medium text-gray-800">60 minutes</div>
                     </div>
                   </div>
@@ -211,7 +268,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                       <Video size={18} className="text-green-600" />
                     </div>
                     <div className='flex flex-col items-start gap-0.5'>
-                      <div className="text-xs text-gray-600">Meet Type</div>
+                      <div className="text-xs text-gray-600 font-medium">Meet Type</div>
                       <div className="text-xs font-medium text-gray-800">Google Meet</div>
                     </div>
                   </div>
@@ -221,7 +278,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                       <Globe size={18} className="text-purple-600" />
                     </div>
                     <div className='flex flex-col items-start gap-0.5'>
-                      <div className="text-xs text-gray-600">Timezone</div>
+                      <div className="text-xs text-gray-600 font-medium">Timezone</div>
                       <div className="text-xs font-medium text-gray-800">Asia/Dhaka</div>
                     </div>
                   </div>
@@ -233,12 +290,8 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
 
               {/* Right side */}
               <div className="w-3/5 p-5 bg-white flex flex-col">
-                {step === "select" ? (
+                {step === "select" && (
                   <>
-                    {/* <div className="mb-7">
-                      <h3 className="text-xl font-bold text-gray-700 mb-1">Schedule Your Session</h3>
-                      <p className="text-gray-600 text-sm">Select your preferred date and time</p>
-                    </div> */}
 
                     {/* Calendar UI */}
                     <div className="mb-5">
@@ -343,18 +396,22 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                         disabled={!selectedDate || !selectedTime}
                         onClick={() => setStep("input")}
                         className={`
-                          px-4 py-2 rounded-md font-md transition-all duration-200 flex-1 border-none
+                          px-4 py-2 rounded-md font-md transition-all duration-200 flex-1 border flex items-center justify-center gap-2 relative 
                           ${selectedTime 
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform cursor-pointer' 
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'text-white bg-blue-600 hover:bg-blue-700 transform group cursor-pointer' 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed border-none'
                           }
                         `}
                       >
-                        Next
+                        <span className='relative z-10'>Next</span>
+                        <ArrowRight size={16} className="relative z-10 transition-transform group-hover:translate-x-1" />
+
                       </button>
                     </div>
                   </>
-                ) : (
+                )} 
+
+                {step === "input" && (
                   <>
                     <h3 className="text-xl font-bold text-gray-700 mb-4">Tell us more</h3>
                     <p className="text-sm text-gray-600 mb-2">Add any notes or details for this session:</p>
@@ -375,29 +432,64 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                       </button>
 
                       <button
-                        onClick={() => {
-                          BookSchedule({ selectedDate, selectedTime, slug, note });
-                          setOpen(false);
-                        }}
+                        onClick={handleSubmit}
                         disabled={!note.trim()}
                         className={`
-                          px-4 py-2 rounded-md font-md transition-all duration-200 flex-1
+                          px-4 py-2 rounded-md font-md transition-all duration-200 flex-1 flex items-center justify-center gap-2
                           ${note.trim()
                             ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform cursor-pointer' 
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           }
                         `}
                       >
-                        Confirm Booking
+                        
+                        <span>Confirm Booking</span>
+                        {loading && <div className="w-3.5 h-3.5 border-2 border-white border-l-transparent rounded-full animate-spin" />}    
+
                       </button>
                     </div>
                   </>
                 )}
+
+                {step === "confirmed" && (
+                  <div className='flex flex-col items-center justify-center gap-2 h-full'>
+
+                     <div className="p-[13px] text-green-600 bg-green-100 rounded-full">
+                      <Check />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-700 mb-2">Booking Confirmed!</h3>
+                    <p className="text-gray-600 text-sm">Your session has been scheduled for:</p>
+                    <p className='text-sm text-gray-700 font-bold'>{formattedTime()}</p>
+
+                    <p className='text-xs text-gray-400 pt-4'>A confirmation email has been sent to your inbox.</p>
+
+                    <button className='mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md cursor-pointer'
+                    onClick={()=>{
+                      setOpen(false);
+                      setStep("select");
+                      setSelectedDate(null);
+                      setSelectedTime("");
+                      setNote("");
+                      router.push('/sessions');
+                    }}>
+                      Done
+                    </button>
+
+                  </div>
+                )}
+
               </div>
             </div>
           </div> 
         ) : (
-          <div>User is not logged in content</div>
+          <div>
+            <h1 className='text-lg font-semibold mb-2'>Please Sign In to book a session</h1>
+            <button onClick={()=> router.push('/login')} className="group px-4 py-2 flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-3xl font-medium overflow-hidden relative border border-blue-600">
+              <span className="relative z-10">Sign In</span>
+              <ArrowRight size={16} className="relative z-10 transition-transform group-hover:translate-x-1" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+            </button>
+          </div>
         )
       )}
 
