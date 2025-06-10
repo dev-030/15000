@@ -57,3 +57,6 @@ export default async function Courses({ searchParams }: any) {
     </>
   );
 }
+
+
+

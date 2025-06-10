@@ -4,12 +4,8 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { bookingSchema } from "../schema";
+import { apiService } from "./api";
 
- 
-
-export const accessToken = async () => {
-  return (await cookies()).get('access_token')?.value;
-}
 
 
 export async function BecomeMentor(data:any){
@@ -213,16 +209,20 @@ export async function GetVideo(courseId:string, videoId:string){
 
 export async function CreateCourseData(formData:FormData){
 
+  const cookie = (await cookies()).get("access_token")?.value;
+
   console.log("requested🔴")
   const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create/`, formData, {
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${cookie}`,
     },
   })
   .then((res) => res.data)
   .catch(error => {
-    console.error("Upload error:", error);
+    console.error("Upload error:", error.response);
   })
+
 
   return res;
 
@@ -264,28 +264,53 @@ export async function CreateSession(data:any){
 }
 
 
+export async function CreateCourseSection(data:any){
+  console.log(data)
 
-export async function SessionRequestsData(){
-
-  const cookie = (await cookies()).get("access_token")?.value;
-
-  try {
-
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/mentor/request-list/`,{
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": ` Bearer ${cookie}`,
-      },
-    }).then((res) => res.json())
-
-    return res;
-
-  } catch (error) {
+  const res = await apiService.post('/course/create-section/', {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
     console.log(error)
-  }
+  })
+
+  // const cookie = (await cookies()).get("access_token")?.value;
+
+  // const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create-section/`, {
+  //   method: 'POST',
+  //   body: JSON.stringify(data),
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "Authorization": `Bearer ${cookie}`,
+  //   },
+  // })
+
+  console.log(res);
 
 }
+
+
+// export async function SessionRequestsData(){
+
+//   const cookie = (await cookies()).get("access_token")?.value;
+
+//   try {
+
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/mentor/request-list/`,{
+//       method: 'GET',
+//       headers: {
+//         "Content-Type": "application/json",
+//         "Authorization": ` Bearer ${cookie}`,
+//       },
+//     }).then((res) => res.json())
+
+//     return res;
+
+//   } catch (error) {
+//     console.log(error)
+//   }
+
+// }
 
 
 

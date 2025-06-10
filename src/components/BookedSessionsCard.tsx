@@ -166,7 +166,6 @@ export default function BookedSessionsCard ({data}:{data:any}) {
   // fix booked sessions card implement all the features in it. also from the mentor implement the rescheduling 
   // feature and also make it work from the client also. also make the data update automatically when mentor accepts
   // send an notification to the user when mentor accepts it
-  // when an normal user becomes mentor updat their refresh and access token with role value
   // make the mentor dashboard functions fully functional also the details page needs more data so add options to add them from the mentors dashboard. 
   // add input field when booking a new session
 
@@ -185,7 +184,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
 
-    console.log(data.results)
+    // console.log(data.results)
 
     const timeRemaining = (targetTime: string) => {
       const now = new Date(); // Local time
@@ -226,13 +225,13 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Booked Sessions</h2>
-        <p className="text-gray-600 text-sm">Access your booked sessions</p>
+        <p className="text-gray-600 text-sm">View and manage your upcoming sessions</p>
       </div>
 
 
 
       {data?.results?.map((data:any)=>(
-        <div key={data.id} className="bg-white rounded-lg shadow p-6">
+        <div key={data.id} className="bg-white rounded-lg shadow p-6 mb-3">
 
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -257,15 +256,19 @@ export default function BookedSessionsCard ({data}:{data:any}) {
             {/* <StatusBadge status={session.status} /> */}
           </div>
 
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center text-gray-600">
-              <Calendar size={18} className="mr-2" />
+          <div className="mt-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Calendar size={18} />
               <span>{formatDate(data.scheduled_at)}</span>
             </div>
-            <div className="flex items-center text-gray-600">
-              <Clock size={18} className="mr-2" />
+            <div className="flex items-center gap-2 text-gray-600">
+              <Clock size={18} />
               <span>{data.duration_min} minutes</span>
-            </div>            
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <span>৳</span>
+              <span>{data.duration_min} taka</span>
+            </div>             
 
           </div>
 

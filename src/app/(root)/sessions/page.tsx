@@ -2,22 +2,22 @@ import BookedSessions from '@/components/bookedSessions';
 import { auth } from '@/lib/auth';
 import { ArrowBigRight, ArrowRight, CalendarDays, Lock } from 'lucide-react';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+
 
 
 
 export default async function Sessions () {
-
+ 
   const user = await auth();
-
+  if(!user) redirect('/login');
 
   return (
     <div className="min-h-screen">
 
-       {user ? (
-        <Suspense fallback={<p>Loading...</p>}>
-          <BookedSessions/>
-        </Suspense>
+
+      {user ? (
+        <BookedSessions/>
       ):(
         <div className="grid place-content-center min-h-screen mt-[-5.5rem]">
           <div className="flex flex-col items-center justify-center gap-2">
@@ -38,9 +38,29 @@ export default async function Sessions () {
           </div>
         </div>
         )
-      }
+      }  
 
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+      
+
+
+
+
+
+
+
+
 

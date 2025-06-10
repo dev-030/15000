@@ -73,9 +73,12 @@ export default async function MyCoursesComponent(){
                                 ></div>
                                 </div>
                             </div>
-                            <button className="mt-2 px-4 py-1 text-sm bg-blue-600 text-white rounded">
-                                {course.status === 'Completed' ? 'Review' : course.progress > 0 ? 'Continue' : 'Start'}
-                            </button>
+                            <div className="mt-3">
+                                <Link href={'/my-courses/10291'} className="px-4 py-1 text-sm bg-blue-600 text-white rounded">
+                                    {course.status === 'Completed' ? 'Review' : course.progress > 0 ? 'Continue' : 'Start'}
+                                </Link>
+                            </div>
+                            
                         </div>
                     ))}
                 </div>

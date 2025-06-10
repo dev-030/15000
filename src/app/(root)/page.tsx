@@ -9,7 +9,7 @@ export default function Home() {
 
 
   return (
-    <>
+    <main>
       
       <Suspense fallback={<p>Loading...</p>}>
         <HomeBanner/>
@@ -25,6 +25,6 @@ export default function Home() {
       </Suspense>
 
       
-     </>
+     </main>
   ); 
 }

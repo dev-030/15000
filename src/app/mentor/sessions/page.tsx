@@ -1,9 +1,10 @@
 'use client'
-import { SessionRequestsAccept, SessionRequestsData } from "@/lib/actions/actions";
+import { SessionRequestsAccept } from "@/lib/actions/actions";
 import axios from "axios";
-import { Clock, DollarSign, X, CalendarDays, MessageCircle, ChevronDown, Calendar, CircleCheck, MessageSquare, Video, Check } from "lucide-react";
+import { Clock, DollarSign, X, CalendarDays, MessageCircle, ChevronDown, Calendar, CircleCheck, MessageSquare, Video, Check, CalendarCog } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 
 // Session type definition
@@ -64,8 +65,8 @@ export default function SessionRequests() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('All Courses');
   const [sortOrder, setSortOrder] = useState('Newest');
-
-  const [data, setData] = useState<any>([]);
+  const [open, setOpen] = useState(false);
+  const [dateTime, setDateTime] = useState<string | null>(null);
 
   // Count sessions by status
   const pendingCount = mockSessions.filter(s => s.status === 'pending').length;
@@ -77,17 +78,24 @@ export default function SessionRequests() {
   const filteredSessions = mockSessions.filter(session => session.status === activeTab);
 
 
-  useEffect(()=>{
-    const data = async () => {
-      const res = await SessionRequestsData();
-      setData(res?.data);
-    };
-    data()
-  },[])
+  const { data, isLoading } = useSWR("/api/mentor/session-requests", (url: string) =>
+    fetch(url).then((res) => res.json()), {
+        // suspense: true,
+        // fallbackData: [{}],
+        // revalidateOnFocus: true,
+        // keepPreviousData: true,
+    }
+  );
 
-
+  console.log(data, isLoading)
 
   const router = useRouter();
+
+  
+  useEffect(() => {
+    document.body.classList.toggle('overflow-hidden', open);
+    return () => { document.body.classList.remove('overflow-hidden'); };
+  }, [open]);
 
 
 
@@ -107,6 +115,7 @@ export default function SessionRequests() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
 
+      
 
        {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -177,13 +186,75 @@ export default function SessionRequests() {
 
 
         <div className="space-y-4">
-        {data.map((session:any) => (
+        { data?.data.map((session:any) => (
           <div key={session.id} className="bg-white rounded-lg shadow">
             <div className="p-6 space-y-4">
 
 
               <h1>{session.id}</h1>
 
+              {open &&
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                  <div className="bg-white p-10 rounded-2xl relative">
+                    <div className='absolute top-3.5 right-3.5 text-gray-400 hover:text-gray-700 cursor-pointer rounded-full p-1'
+                    onClick={() => {
+                      setOpen(false)
+                    }}
+                    >
+                      <X size={17} />
+                    </div>
+                    <div className="p-4 max-w-sm mx-auto bg-white space-y-4 mb-4">
+
+                        <p className="text-gray-400 pb-1 text-xs">You're about to suggest a new time for your session with Alex Thompson. The student will be notified and can accept or decline your suggestion.</p>
+
+                        <label htmlFor="datetime" className="block text-gray-600 ">
+                          Choose Date & Time:
+                        </label>
+
+                        <input
+                          type="datetime-local"
+                          id="datetime"
+                          onChange={(e) => setDateTime(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800"
+                        />
+
+                        <div className="text-sm text-gray-500 flex flex-col justify-items-start gap-2">
+                          <p>
+                          Current Date & Time : {new Date(session.scheduled_at).toLocaleString('en-US',{
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                          })}
+                          </p>
+                          <p>
+                          New Date & Time : {dateTime ? new Date(dateTime).toLocaleString('en-US',{
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                          }) : 'None'}
+                          </p>
+                        </div>
+
+                        <button className={`text-white px-4 py-2 rounded-md flex items-center justify-center  ${!dateTime ? 'bg-blue-400':'bg-blue-600 cursor-pointer hover:bg-blue-700'}`}
+                        disabled={!dateTime}
+                        onClick={()=>{
+                          console.log(dateTime, session.id)
+                        }}
+                        >
+                          <Check className="w-5 h-5 mr-1" />
+                          Request Reschedule
+                        </button>
+                      </div>
+                  </div>
+                </div>
+              }
+              
 
                 {/* Student Info */}
                 
@@ -264,20 +335,28 @@ export default function SessionRequests() {
                   </div>
                 ):(
                   <div className="flex gap-4">
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center justify-center" 
+                    
+                    <button className="border border-gray-300 hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-md flex items-center justify-center flex-1 cursor-pointer">
+                      <X className="w-5 h-5 mr-1"/>                     
+                      Decline
+                    </button>
+
+                    <button className="border border-gray-300 hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-md flex items-center justify-center flex-1 cursor-pointer"
+                    onClick={()=> setOpen(!open)}>
+                      <CalendarCog className="w-5 h-5 mr-1"/>
+                      Reschedule
+                    </button>
+
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center justify-center cursor-pointer" 
                     onClick={()=>{
                       onAccept(session.id)
                     }}
                     >
-                        <Check className="w-5 h-5 mr-1" />
-                        Accept Request
+                      <Check className="w-5 h-5 mr-1" />
+                      Accept Request
                     </button>
-                    <button className="border border-gray-300 hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-md flex items-center justify-center flex-1">
-                        <X className="w-5 h-5 mr-1"/>                     
-                        Decline
-                    </button>
-                    
-                </div>
+            
+                  </div>
                 )}
                 
                 </div>

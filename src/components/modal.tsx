@@ -142,10 +142,10 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
 
 
 
-  // useEffect(() => {
-  //   document.body.classList.toggle('overflow-hidden', open);
-  //   return () => { document.body.classList.remove('overflow-hidden'); };
-  // }, [open]);
+  useEffect(() => {
+    document.body.classList.toggle('overflow-hidden', open);
+    return () => { document.body.classList.remove('overflow-hidden'); };
+  }, [open]);
 
 
   // useEffect(() => {

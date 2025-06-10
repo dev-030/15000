@@ -1,26 +1,52 @@
-// 'use client'
+// 'use client' 
 // import { useEffect, useRef } from 'react';
 // import Plyr from 'plyr';
 // import 'plyr/dist/plyr.css';
 // import shaka from 'shaka-player';
 
+import VideoList from "@/components/VideoList";
 import { redirect } from "next/navigation";
 
 
 
 
 
-export default async function CourseContent({ params }: { params: Promise<{ slug: string }>}){
+export default async function CoursePage({ params, searchParams }: {params: { courseId: string }, searchParams: { video?: string }}) {
 
     const { slug } = await params;
+    const {video} = await searchParams;
+
+    // console.log({slug, video})
+
+    //   if (!video && courseData.videos.length > 0) {
+    //     redirect(`/my-courses/${params.courseId}?video=${courseData.videos[0].id}`);
+    //   }
 
 
+    // if there aren't any search params and there are videos, redirect to the first video
+    if (!video) {
+        redirect(`/my-courses/${slug}?video=2kne398`);
+    }
+
+    console.log(!video)
 
     return(
 
-        <div>
-            <h1>{slug}</h1>
-            https://vz-2cc3073c-80d.b-cdn.net/bcdn_token=yqkQSqFJRRvu0obt0WE9C_-4H8Vr_DWbhDD84umuWw0&expires=1746368594&token_path=%2Fc5a387f0-17d5-4948-b4a9-003112828075%2F/c5a387f0-17d5-4948-b4a9-003112828075/playlist.m3u8
+        <div className="min-h-screen flex items-center gap-3 w-full">
+
+            <div className="relative bg-amber-100 border border-amber-300 p-10 rounded-md w-4/5">
+                <iframe src="https://iframe.mediadelivery.net/embed/450619/49644ba1-3e50-47e6-9cd7-cb3374cf8537?autoplay=true&loop=false&muted=false&preload=true&responsive=true" loading="lazy" className="border-none top-0 h-96 w-full" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
+            </div>
+
+
+            <div className="bg-gray-100 border border-gray-300 p-10 rounded-md max-w-1/5">
+                <h1>Video play list sections</h1>
+                <h1>course id : {slug}</h1>
+                <h1>video id : {video}</h1>
+
+                <VideoList currentVideoId={video}/>
+            </div>  
+            
         </div>
         
     )
@@ -31,7 +57,7 @@ export default async function CourseContent({ params }: { params: Promise<{ slug
 
 
 
-
+// use signed url to get the video url
 
 
 

@@ -6,8 +6,8 @@ import { X, Clock, DollarSign } from 'lucide-react';
 import React from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import CreateSessionModal from '@/components/SessionModal';
-import axios from 'axios';
 import { SessionManagementData } from '@/lib/actions/actions';
+import useSWR from 'swr';
 
 
 interface Session {
@@ -19,35 +19,32 @@ interface Session {
   duration: number;
   isActive: boolean;
   icon: string;
-}
+} 
 
 
 export default function SessionManagement() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [courseData, setCourseData] = useState([]);
-  
-  useEffect(()=>{
-    const data = async () => {
-      const res = await SessionManagementData();
-      setCourseData(res.results);
-    };
+  const {data, isLoading} = useSWR("/api/session-list", (url: string) =>
+    fetch(url).then((res) => res.json())
+  );
 
-    data()
 
-  },[])
 
-  
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-
 
       <div className=" rounded-lg min-h-screen">
 
         <CreateSessionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-        {courseData?.length > 0 ? (
+        {isLoading ? (
+          <div className="min-h-screen grid place-content-center">
+              <p>Loading data...</p>
+          </div>
+        ) : data?.results && data.results.length > 0 ? (
           <div>
 
             <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-lg">
@@ -62,7 +59,7 @@ export default function SessionManagement() {
             </div>
           
             <div className="flex flex-wrap gap-6">
-              {courseData?.map((session) => (
+              {data?.results?.map((session:any) => (
                 <div key={session.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
                   <div className="flex justify-between items-start mb-4">
 
@@ -97,6 +94,7 @@ export default function SessionManagement() {
                         <span className="text-gray-800 text-sm">{session.duration} minutes</span>
                       </div>
                     </div>
+
                   </div>
 
                   <div className="mb-4">
@@ -123,7 +121,7 @@ export default function SessionManagement() {
               ))}
             </div>
           </div>
-        ):(
+        ) : (
           <div className="w-full h-full p-6 bg-white rounded-lg  flex flex-col items-center justify-between">
        
             <div className="mb-8 relative">

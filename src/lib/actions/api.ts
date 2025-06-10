@@ -57,24 +57,31 @@ class RestApi {
             ...fetchOptions,
             headers,
         });
-        
+
         if (!response.ok) {
             throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         }
 
+        // if (!response.ok) {
+
+        //     const val = await response.json();
+
+        //     if(!!val) return response.json();
+
+        //     throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+        // }
+    
+
         return response.json();
     }
+
 
     async get<T>(endpoint: string, options?: Omit<ApiOptions, 'method' | 'body'>) {
         return this.request<T>(endpoint, { ...options, method: 'GET' });
     }
 
-    async post<T>(endpoint: string, data?: any, options?: Omit<ApiOptions, 'method'>) {
-        return this.request<T>(endpoint, {
-            ...options,
-            method: 'POST',
-            body: data ? JSON.stringify(data) : undefined,
-        });
+    async post<T>(endpoint: string, options?: Omit<ApiOptions, 'method'>): Promise<T> {
+        return this.request<T>(endpoint, { ...options, method: 'POST' });
     }
 
     async put<T>(endpoint: string, data?: any, options?: Omit<ApiOptions, 'method'>) {

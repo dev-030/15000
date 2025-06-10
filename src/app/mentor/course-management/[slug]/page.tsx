@@ -79,21 +79,21 @@ export default function CourseManagement () {
     //   cache: 'no-cache', 
     // }).then((res) => res.json());
   
-    const [showInput, setShowInput] = useState(false);
-    const [showVideoInput, setVideoInput] = useState(false);
+    // const [showInput, setShowInput] = useState(false);
+    // const [showVideoInput, setVideoInput] = useState(false);
 
-    const [sectionName, setSectionName] = useState('');
-    const [sections, setSections] = useState([]);
+    // const [sectionName, setSectionName] = useState('');
+    // const [sections, setSections] = useState([]);
 
-    const [videoTitle, setVideoTitle] = useState('');
-    const [videoFile, setVideoFile] = useState(null);
+    // const [videoTitle, setVideoTitle] = useState('');
+    // const [videoFile, setVideoFile] = useState(null);
   
-  const [courseTitle, setCourseTitle] = useState('Design Principles 101');
-  const [category, setCategory] = useState('Design');
-  const [tags, setTags] = useState(['UI Design', 'UI Design Fundamental']);
-  const [description, setDescription] = useState('This course introduces the foundational concepts of UI design including principles, patterns, and usability.');
-  const [thumbnail, setThumbnail] = useState<{ file: File; url: string } | null>(null);
-  const [video, setVideo] = useState<{ file: File; url: string } | null>(null);
+    const [courseTitle, setCourseTitle] = useState('Design Principles 101');
+    const [category, setCategory] = useState('Design');
+    const [tags, setTags] = useState(['UI Design', 'UI Design Fundamental']);
+    const [description, setDescription] = useState('This course introduces the foundational concepts of UI design including principles, patterns, and usability.');
+    const [thumbnail, setThumbnail] = useState<{ file: File; url: string } | null>(null);
+    const [video, setVideo] = useState<{ file: File; url: string } | null>(null);
 
 
 
@@ -113,55 +113,54 @@ export default function CourseManagement () {
   };
 
 
-  const handleSectioinCreate = async () => {
+    // const handleSectioinCreate = async () => {
 
-    try {
+    //     try {
 
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create-section/`,{
-            course_id: params.slug,
-            section_name: sectionName
-        });
-    
-        const newSection = {
-            id: response.data.id,
-            title: sectionName,
-            lectures: 0,
-            videos: []
-        };
-
-        setSections(prev => [...prev, newSection]); // Add new section
-
-        setSectionName('');
-        setShowInput(false);
+    //         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create-section/`,{
+    //             course: params.slug,
+    //             section_name: sectionName
+    //         });
         
-    } catch (error) {
-        console.error('Failed to create section:', error);
-    }
+    //         const newSection = {
+    //             id: response.data.id,
+    //             title: sectionName,
+    //             lectures: 0,
+    //             videos: []
+    //         };
+
+    //         setSections(prev => [...prev, newSection]); 
+
+    //         setSectionName('');
+    //         setShowInput(false);
+            
+    //     } catch (error) {
+    //         console.error('Failed to create section:', error);
+    //     }
+
+    // };
 
 
-  };
 
+//   const handleUploadVideo = async (courseId:any) => {
 
+//     if (!videoTitle || !videoFile) {
+//         alert('Please enter title and select a video');
+//         return;
+//     }
 
-  const handleUploadVideo = async (courseId:any) => {
+//     // console.log(courseId, videoTitle, videoFile);
 
-    if (!videoTitle || !videoFile) {
-        alert('Please enter title and select a video');
-        return;
-    }
-
-    // console.log(courseId, videoTitle, videoFile);
-
-    try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/add-video/`,{
-            title: videoTitle,
-            section_id: courseId,
-        });
-        console.log(response.data)
-    } catch (error) {
-        console.error('Failed to upload video:', error);
-    }
-  };
+//     try {
+//         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/add-video/`,{
+//             title: videoTitle,
+//             section_id: courseId,
+//         });
+//         console.log(response.data)
+//     } catch (error) {
+//         console.error('Failed to upload video:', error);
+//     }
+//   };
 
 
 //   console.log(sections)
@@ -183,103 +182,102 @@ export default function CourseManagement () {
         <TabPanel>
         
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
-                {/* Form Inputs */}
+
                 <div className="space-y-4">
-                <div>
-                    <label className="block mb-1 font-medium">Course Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-gray-300 p-2 rounded">
-                    <option>Select category</option>
-                    <option value="Design">Design</option>
-                    <option value="Development">Development</option>
-                    </select>
-                </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Course Category</label>
+                        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-gray-300 p-2 rounded">
+                        <option>Select category</option>
+                        <option value="Design">Design</option>
+                        <option value="Development">Development</option>
+                        </select>
+                    </div>
 
-                <div>
-                    <label className="block mb-1 font-medium">Course Title</label>
-                    <input type="text" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} className="w-full border border-gray-300 p-2 rounded" />
-                </div>
+                    <div>
+                        <label className="block mb-1 font-medium">Course Title</label>
+                        <input type="text" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} className="w-full border border-gray-300 p-2 rounded" />
+                    </div>
 
-                <div>
-                    <label className="block mb-1 font-medium">Course Tag</label>
-                    <input type="text" placeholder="Add tag" className="w-full border border-gray-300 p-2 rounded" />
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                    {tags.map((tag, idx) => (
-                        <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-sm">{tag}</span>
-                    ))}
+                    <div>
+                        <label className="block mb-1 font-medium">Course Tag</label>
+                        <input type="text" placeholder="Add tag" className="w-full border border-gray-300 p-2 rounded" />
+                        <div className="mt-2 flex gap-2 flex-wrap">
+                        {tags.map((tag, idx) => (
+                            <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-sm">{tag}</span>
+                        ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block mb-1 font-medium">Course Description</label>
+                        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border border-gray-300 p-2 rounded h-24" />
+                        <p className="text-xs text-orange-500 mt-1">Minimum 150 characters and maximum of 250 chars required.</p>
                     </div>
                 </div>
 
-                <div>
-                    <label className="block mb-1 font-medium">Course Description</label>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border border-gray-300 p-2 rounded h-24" />
-                    <p className="text-xs text-orange-500 mt-1">Minimum 150 characters and maximum of 250 chars required.</p>
-                </div>
-                </div>
 
-                {/* Uploads + Takeaways */}
                 <div className="space-y-6">
-                <div className="flex gap-4">
-                    {/* Intro Video */}
-                    <div className="w-1/2">
-                    <label className="block mb-1 font-medium">Intro Video</label>
-                    <label htmlFor="introVideo" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-gray-400 relative">
-                        {video ? (
-                        <>
-                            <video src={video.url} className="w-full h-full object-cover pointer-events-none" muted preload="metadata" />
-                            <button type="button" onClick={() => handleRemove('video')} className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-                            <Trash2 size={18} className="text-red-500" />
-                            </button>
-                        </>
-                        ) : (
-                        <>
-                            <PlayCircle size={32} />
-                            <p className="text-sm">Upload intro video</p>
-                            <p className="text-xs text-red-500">Max file size is 5mb</p>
-                        </>
-                        )}
-                    </label>
-                    <input id="introVideo" type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} className="hidden" />
+                    <div className="flex gap-4">
+                        {/* Intro Video */}
+                        <div className="w-1/2">
+                        <label className="block mb-1 font-medium">Intro Video</label>
+                        <label htmlFor="introVideo" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-gray-400 relative">
+                            {video ? (
+                            <>
+                                <video src={video.url} className="w-full h-full object-cover pointer-events-none" muted preload="metadata" />
+                                <button type="button" onClick={() => handleRemove('video')} className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
+                                <Trash2 size={18} className="text-red-500" />
+                                </button>
+                            </>
+                            ) : (
+                            <>
+                                <PlayCircle size={32} />
+                                <p className="text-sm">Upload intro video</p>
+                                <p className="text-xs text-red-500">Max file size is 5mb</p>
+                            </>
+                            )}
+                        </label>
+                        <input id="introVideo" type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} className="hidden" />
+                        </div>
+
+                        {/* Upload Thumbnail */}
+                        <div className="w-1/2">
+                        <label className="block mb-1 font-medium">Upload Thumbnail</label>
+                        <label htmlFor="thumbnail" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-gray-400 relative">
+                            {thumbnail ? (
+                            <>
+                                <img src={thumbnail.url} alt="thumbnail" className="w-full h-full object-cover" />
+                                <button type="button" onClick={() => handleRemove('thumbnail')} className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
+                                <Trash2 size={18} className="text-red-500" />
+                                </button>
+                            </>
+                            ) : (
+                            <>
+                                <UploadCloud size={32} />
+                                <p className="text-sm">Upload thumbnail</p>
+                                <p className="text-xs text-orange-500">*Upload landscape image</p>
+                            </>
+                            )}
+                        </label>
+                        <input id="thumbnail" type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'thumbnail')} className="hidden" />
+                        </div>
                     </div>
 
-                    {/* Upload Thumbnail */}
-                    <div className="w-1/2">
-                    <label className="block mb-1 font-medium">Upload Thumbnail</label>
-                    <label htmlFor="thumbnail" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-gray-400 relative">
-                        {thumbnail ? (
-                        <>
-                            <img src={thumbnail.url} alt="thumbnail" className="w-full h-full object-cover" />
-                            <button type="button" onClick={() => handleRemove('thumbnail')} className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-                            <Trash2 size={18} className="text-red-500" />
-                            </button>
-                        </>
-                        ) : (
-                        <>
-                            <UploadCloud size={32} />
-                            <p className="text-sm">Upload thumbnail</p>
-                            <p className="text-xs text-orange-500">*Upload landscape image</p>
-                        </>
-                        )}
-                    </label>
-                    <input id="thumbnail" type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'thumbnail')} className="hidden" />
-                    </div>
-                </div>
 
-                {/* Takeaways */}
-                <div>
-                    <h2 className="font-medium mb-2">Take Aways</h2>
-                    <ul className="list-disc list-inside text-sm space-y-1 text-gray-600">
-                    <li>Clearly define the specific knowledge or skills that participants will gain by the end of the course.</li>
-                    <li>Create content that is interactive, visually appealing, and varied to keep participants engaged and motivated throughout the course.</li>
-                    <li>Organise the course content in a logical and sequential manner to ensure a smooth learning experience and progression of concepts.</li>
-                    <li>Provide real-world examples and case studies to help participants understand how the course material can be applied in practical scenarios.</li>
-                    <li>Include quizzes, assignments, or practical exercises to assess participants' understanding and provide them with valuable feedback.</li>
-                    <li>Keep the course up-to-date by regularly reviewing and updating the content to ensure its relevance and accuracy.</li>
-                    </ul>
-                </div>
+                    <div>
+                        <h2 className="font-medium mb-2">Take Aways</h2>
+                        <ul className="list-disc list-inside text-sm space-y-1 text-gray-600">
+                        <li>Clearly define the specific knowledge or skills that participants will gain by the end of the course.</li>
+                        <li>Create content that is interactive, visually appealing, and varied to keep participants engaged and motivated throughout the course.</li>
+                        <li>Organise the course content in a logical and sequential manner to ensure a smooth learning experience and progression of concepts.</li>
+                        <li>Provide real-world examples and case studies to help participants understand how the course material can be applied in practical scenarios.</li>
+                        <li>Include quizzes, assignments, or practical exercises to assess participants' understanding and provide them with valuable feedback.</li>
+                        <li>Keep the course up-to-date by regularly reviewing and updating the content to ensure its relevance and accuracy.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            {/* Buttons */}
             <div className="mt-6 flex justify-end gap-4">
                 <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancel</button>
                 <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save & Continue</button>
@@ -379,7 +377,7 @@ export default function CourseManagement () {
 
 
 
-                <VideoSectionsUI/>
+            <VideoSectionsUI courseId={params}/>
 
 
                 

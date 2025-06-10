@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Plus, Video, Upload, X } from 'lucide-react';
+import { CreateCourseSection } from '@/lib/actions/actions';
 
-const VideoSectionsUI = () => {
+const VideoSectionsUI = ({courseId}:{courseId:string}) => {
   const [sections, setSections] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [sectionName, setSectionName] = useState('');
@@ -9,12 +10,36 @@ const VideoSectionsUI = () => {
   const [videoTitle, setVideoTitle] = useState('');
   const [videoFile, setVideoFile] = useState(null);
 
-  const handleSectionCreate = () => {
+  console.log(courseId.slug)
+
+  const handleSectionCreate = async() => {
+
+
     if (sectionName.trim()) {
-      setSections([...sections, { id: Date.now(), title: sectionName, videos: [] }]);
-      setSectionName('');
-      setShowInput(false);
+
+      const response = await CreateCourseSection({
+        course: courseId.slug,
+        section_name: sectionName
+      })
+
+      
+      // await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create-section/`,{
+      //   method: 'POST',
+      //   body: JSON.stringify({
+      //       course: courseId.slug,
+      //       section_name: sectionName
+      //   })
+      // })
+      // .then((res) => res.json())
+      // .catch(error => {
+      //   console.error("Upload error:", error.response);
+      // })
+
+      // setSections([...sections, { id: Date.now(), title: sectionName, videos: [] }]);
+      // setSectionName('');
+      // setShowInput(false);
     }
+
   };
 
   const handleUploadVideo = (sectionId) => {

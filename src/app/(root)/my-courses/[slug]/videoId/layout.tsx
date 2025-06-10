@@ -5,6 +5,9 @@ import { redirect } from "next/navigation";
 import VideoSidebar from "@/components/videoSidebar";
 
 
+
+
+
 export default async function AppLayout({children, params}:{children:React.ReactNode, params: Promise<{ courseId: string }>}) {
 
 

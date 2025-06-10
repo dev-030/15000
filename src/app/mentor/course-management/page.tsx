@@ -1,27 +1,27 @@
 import { MoreVertical,  Edit, MonitorCog } from 'lucide-react';
 import { Clock} from 'lucide-react';
 import React from 'react';
-import { Calendar, Plus } from 'lucide-react';
-import axios from 'axios';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { apiService } from '@/lib/actions/api';
 
 
 export default async function CourseManagement() {  
   
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/mentor/gig-list/`, {
-        headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4MjU5ODQ0LCJpYXQiOjE3NDczOTU4NDQsImp0aSI6ImRiNmM4YzM5NzEwZjQ1MmE4YjdhNzNmYjU0N2M0YjU3IiwidXNlcl9pZCI6IjkzOWEzZDYyLTQzYjEtNDJlMi1iNGFjLWFmMzMxYmU1YzY2MiIsInVzZXJuYW1lIjoiYXlvbl9kZWVhMDNkMiIsImZ1bGxfbmFtZSI6IiIsInByb2ZpbGVfcGljIjoiaHR0cHM6Ly9jZG4ucGl4YWJheS5jb20vcGhvdG8vMjAxNS8xMC8wNS8yMi8zNy9ibGFuay1wcm9maWxlLXBpY3R1cmUtOTczNDYwXzEyODAucG5nIn0.jhZU6SsMtQcisAWBbN5tksjzlatUtHb_MrNJ2XYQsRw`,
-        }
+    const response = await apiService.get(`/mentor/gig-list/`,{
+        requiresAuth: true
     })
+
+    console.log(response)
 
 
     return (
+
         <div className="p-6 bg-gray-50 min-h-screen">
 
             <div className="rounded-lg">
 
-                {response?.data?.results.length > 0 ? (
+                {response?.results.length > 0 ? (
 
                 <div>
 
@@ -37,7 +37,7 @@ export default async function CourseManagement() {
                     </div>
                 
                     <div className="flex flex-wrap gap-4">
-                    {response?.data?.results?.map((session:any) => (
+                    {response?.results?.map((session:any) => (
                         <div key={session.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
 
                             <div className="flex justify-between items-start mb-4">

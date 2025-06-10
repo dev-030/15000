@@ -141,13 +141,13 @@ export default function CreateCourse(){
     };
 
 
-    useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setOpen(false);
-    };
-    if (open) window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-    }, [open]);
+    // useEffect(() => {
+    // const handler = (e: KeyboardEvent) => {
+    //     if (e.key === 'Escape') setOpen(false);
+    // };
+    // if (open) window.addEventListener('keydown', handler);
+    // return () => window.removeEventListener('keydown', handler);
+    // }, [open]);
 
 
     const form = useForm({
@@ -218,13 +218,13 @@ export default function CreateCourse(){
         <div className="p-6 max-w-7xl mx-auto bg-white">
 
             {open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setOpen(false)}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
                     <h1 className="text-3xl font-semibold text-amber-50">{modalData}</h1>
                 </div>
             )}
             
 
-
+    
 
 
             <h2 className="text-2xl font-bold mb-6">Course Management</h2>
@@ -253,7 +253,7 @@ export default function CreateCourse(){
                                     ? 'Title must be at least 3 characters'
                                     : undefined,
                             }}
-                            children={(field) => (
+                            children={(field) => (  
                                 <div>
                                     <label className="block mb-1 font-medium">Course Title</label>
                                     <input
