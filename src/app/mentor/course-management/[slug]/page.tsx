@@ -73,6 +73,8 @@ export default function CourseManagement () {
 
     const params = useParams();
 
+    // /course/detail/?course_id=0ac48526-42c8-44fe-8bc0-dbc0291cd7dd
+
 
     // const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/instructor/${slug}`, {
     //   method: 'GET',

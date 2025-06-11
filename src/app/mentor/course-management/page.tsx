@@ -8,7 +8,7 @@ import { apiService } from '@/lib/actions/api';
 
 export default async function CourseManagement() {  
   
-    const response = await apiService.get(`/mentor/gig-list/`,{
+    const response = await apiService.get(`/course/list/`,{
         requiresAuth: true
     })
 
@@ -21,7 +21,7 @@ export default async function CourseManagement() {
 
             <div className="rounded-lg">
 
-                {response?.results.length > 0 ? (
+                {response?.length > 0 ? (
 
                 <div>
 
@@ -37,16 +37,16 @@ export default async function CourseManagement() {
                     </div>
                 
                     <div className="flex flex-wrap gap-4">
-                    {response?.results?.map((session:any) => (
-                        <div key={session.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
+                    {response?.map((course:any) => (
+                        <Link href={`/mentor/course-management/${course.id}`} key={course.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
 
                             <div className="flex justify-between items-start mb-4">
 
-                                <h3 className="font-medium text-lg text-gray-700">{session.title}</h3>
+                                <h3 className="font-medium text-lg text-gray-700">{course.course_name}</h3>
 
                                 <div className="flex items-center gap-2">
-                                <span className={`px-2 py-1 text-xs rounded-full ${session.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-700'}`}>
-                                    {session.isActive ? 'Active' : 'Inactive'}
+                                <span className={`px-2 py-1 text-xs rounded-full ${course.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-700'}`}>
+                                    {course.isActive ? 'Active' : 'Inactive'}
                                 </span>
                                 <button className="text-gray-500 hover:text-gray-700">
                                     <MoreVertical size={16} />
@@ -61,24 +61,18 @@ export default async function CourseManagement() {
                                 <h4 className="text-xs text-gray-600 mb-1">PRICE</h4>
                                 <div className="flex items-center">
                                     <span className="text-gray-800 text-sm">
-                                    ৳ {session.price.toLocaleString()}
+                                    {/* ৳ {course.price.toLocaleString()} */}
                                     </span>
                                 </div>
                                 </div>
                                 
-                                <div>
-                                <h4 className="text-xs text-gray-600 mb-1">DURATION</h4>
-                                <div className="flex items-center">
-                                    <Clock size={15} className="text-gray-600 mr-1" />
-                                    <span className="text-gray-800 text-sm">{session.duration} minutes</span>
-                                </div>
-                                </div>
+                               
                             </div>
 
                             <div className="mb-4">
                                 <h4 className="text-xs text-gray-700 mb-1">DESCRIPTION</h4>
                                 <p className="text-sm text-gray-800">
-                                One-on-one mentoring session for web development. Get personalized guidance on HTML, CSS, JavaScript, and modern frameworks. Perfect for beginners and intermediate developers looking to improve their skills.
+                                One-on-one mentoring course for web development. Get personalized guidance on HTML, CSS, JavaScript, and modern frameworks. Perfect for beginners and intermediate developers looking to improve their skills.
                                 </p>
                             </div>
 
@@ -90,11 +84,11 @@ export default async function CourseManagement() {
                                 </button>
                                 <button className="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-0 rounded-lg flex items-center justify-center cursor-pointer">
                                 <Edit size={15} className="mr-1" /> 
-                                <p className='text-sm'>Edit Session</p>
+                                <p className='text-sm'>Edit course</p>
                                 </button>
                             </div>
 
-                        </div>
+                        </Link>
                     ))}
                     </div>
                 </div>
