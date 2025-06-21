@@ -265,7 +265,6 @@ export async function CreateSession(data:any){
 
 
 export async function CreateCourseSection(data:any){
-  console.log(data)
 
   const res = await apiService.post('/course/create-section/', {
     requiresAuth: true,
@@ -274,21 +273,23 @@ export async function CreateCourseSection(data:any){
     console.log(error)
   })
 
-  // const cookie = (await cookies()).get("access_token")?.value;
-
-  // const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create-section/`, {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "Authorization": `Bearer ${cookie}`,
-  //   },
-  // })
-
-  console.log(res);
+  return res;
 
 }
 
+
+export async function UploadCourseVideo(data:any){
+
+  const res = await apiService.post('/course/add-section-video/' , {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
+    console.log(error)
+  })
+
+  return res;
+
+}
 
 // export async function SessionRequestsData(){
 

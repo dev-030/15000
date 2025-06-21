@@ -58,6 +58,7 @@ class RestApi {
             headers,
         });
 
+
         if (!response.ok) {
             throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         }
@@ -70,7 +71,6 @@ class RestApi {
 
         //     throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         // }
-    
 
         return response.json();
     }

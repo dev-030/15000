@@ -3,83 +3,84 @@ import React, { useEffect, useState } from 'react';
 import { PlayCircle, UploadCloud, Trash2 } from 'lucide-react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import axios from 'axios';
 import { useParams } from 'next/navigation';
 import VideoSectionsUI from './videoUi';
+import useSWR from 'swr';
 
 
 
-const value  = {
-    "id": "1",
-    "title": "Money Management",
-    "subtitle": "Learn how to save money, create a budget, and invest wisely with industry-expert guidance.",
-    "course_content": {
-      "total_sections": 4,
-      "total_lectures": 32,
-      "total_length": "1h 26m",
-      "sections": [
-        {
-          "title": "Best Habits",
-          "lectures": 5,
-          "length": "8",
-          "videos": [
-            { "id": 1, "title": "Welcome to the course", "length": "1m" },
-            { "id": 2, "title": "What is a habit?", "length": "2m" },
-            { "id": 3, "title": "How to create a habit?", "length": "2m" },
-            { "id": 4, "title": "Habits and their benefits", "length": "2m" }
-          ]
-        },
-        {
-          "title": "Best Practices and Planning",
-          "lectures": 10,
-          "length": "20",
-          "videos": [
-            { "id": 5, "title": "Welcome to the course", "length": "1m" },
-            { "id": 6, "title": "What is a habit?", "length": "2m" },
-            { "id": 7, "title": "How to create a habit?", "length": "2m" },
-            { "id": 8, "title": "Habits and their benefits", "length": "2m" }
-          ]
-        },
-        {
-          "title": "Advanced Budget Strategies",
-          "lectures": 8,
-          "length": "30",
-          "videos": [
-            { "id": 9, "title": "Welcome to the course", "length": "1m" },
-            { "id": 10, "title": "What is a habit?", "length": "2m" },
-            { "id": 11, "title": "How to create a habit?", "length": "2m" },
-            { "id": 12, "title": "Habits and their benefits", "length": "2m" }
-          ]
-        },
-        {
-          "title": "Investment Fundamentals",
-          "lectures": 9,
-          "length": "28",
-          "videos": [
-            { "id": 13, "title": "Welcome to the course", "length": "1m" },
-            { "id": 14, "title": "What is a habit?", "length": "2m" },
-            { "id": 15, "title": "How to create a habit?", "length": "2m" },
-            { "id": 16, "title": "Habits and their benefits", "length": "2m" }
-          ]
-        }
-      ]              
-    } 
-  }
+// const value  = {
+//     "id": "1",
+//     "title": "Money Management",
+//     "subtitle": "Learn how to save money, create a budget, and invest wisely with industry-expert guidance.",
+//     "course_content": {
+//       "total_sections": 4,
+//       "total_lectures": 32,
+//       "total_length": "1h 26m",
+//       "sections": [
+//         {
+//           "title": "Best Habits",
+//           "lectures": 5,
+//           "length": "8",
+//           "videos": [
+//             { "id": 1, "title": "Welcome to the course", "length": "1m" },
+//             { "id": 2, "title": "What is a habit?", "length": "2m" },
+//             { "id": 3, "title": "How to create a habit?", "length": "2m" },
+//             { "id": 4, "title": "Habits and their benefits", "length": "2m" }
+//           ]
+//         },
+//         {
+//           "title": "Best Practices and Planning",
+//           "lectures": 10,
+//           "length": "20",
+//           "videos": [
+//             { "id": 5, "title": "Welcome to the course", "length": "1m" },
+//             { "id": 6, "title": "What is a habit?", "length": "2m" },
+//             { "id": 7, "title": "How to create a habit?", "length": "2m" },
+//             { "id": 8, "title": "Habits and their benefits", "length": "2m" }
+//           ]
+//         },
+//         {
+//           "title": "Advanced Budget Strategies",
+//           "lectures": 8,
+//           "length": "30",
+//           "videos": [
+//             { "id": 9, "title": "Welcome to the course", "length": "1m" },
+//             { "id": 10, "title": "What is a habit?", "length": "2m" },
+//             { "id": 11, "title": "How to create a habit?", "length": "2m" },
+//             { "id": 12, "title": "Habits and their benefits", "length": "2m" }
+//           ]
+//         },
+//         {
+//           "title": "Investment Fundamentals",
+//           "lectures": 9,
+//           "length": "28",
+//           "videos": [
+//             { "id": 13, "title": "Welcome to the course", "length": "1m" },
+//             { "id": 14, "title": "What is a habit?", "length": "2m" },
+//             { "id": 15, "title": "How to create a habit?", "length": "2m" },
+//             { "id": 16, "title": "Habits and their benefits", "length": "2m" }
+//           ]
+//         }
+//       ]              
+//     } 
+//   }
+
+
+
 
 export default function CourseManagement () {
 
 
-    // const { slug } = await params;
-
     const params = useParams();
 
-    // /course/detail/?course_id=0ac48526-42c8-44fe-8bc0-dbc0291cd7dd
 
+    const {data, isLoading} = useSWR(`/api/course_list_detail?course_id=${params.slug}`, (url: string) =>
+        fetch(url).then((res) => res.json())
+    );
 
-    // const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/instructor/${slug}`, {
-    //   method: 'GET',
-    //   cache: 'no-cache', 
-    // }).then((res) => res.json());
+    console.log(data)
+
   
     // const [showInput, setShowInput] = useState(false);
     // const [showVideoInput, setVideoInput] = useState(false);
@@ -379,14 +380,14 @@ export default function CourseManagement () {
 
 
 
-            <VideoSectionsUI courseId={params}/>
+            <VideoSectionsUI courseId={params.slug as string} data={data?.sections}/>
 
 
                 
 
         </TabPanel>
 
-    </Tabs>
+    </Tabs> 
 
 
 

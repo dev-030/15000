@@ -1,64 +1,152 @@
+'use client'
 import { useState } from 'react';
 import { Plus, Video, Upload, X } from 'lucide-react';
-import { CreateCourseSection } from '@/lib/actions/actions';
+import { CreateCourseSection, UploadCourseVideo } from '@/lib/actions/actions';
+import * as tus from 'tus-js-client'; 
 
-const VideoSectionsUI = ({courseId}:{courseId:string}) => {
-  const [sections, setSections] = useState([]);
+
+
+
+
+
+const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
+
+  const [sections, setSections] = useState(data || []);
   const [showInput, setShowInput] = useState(false);
   const [sectionName, setSectionName] = useState('');
   const [activeVideoSection, setActiveVideoSection] = useState(null);
   const [videoTitle, setVideoTitle] = useState('');
   const [videoFile, setVideoFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [currentUpload, setCurrentUpload] = useState(null);
 
-  console.log(courseId.slug)
+
+
+  console.log(data)
 
   const handleSectionCreate = async() => {
-
 
     if (sectionName.trim()) {
 
       const response = await CreateCourseSection({
-        course: courseId.slug,
+        course: courseId,
         section_name: sectionName
       })
 
-      
-      // await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create-section/`,{
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //       course: courseId.slug,
-      //       section_name: sectionName
-      //   })
-      // })
-      // .then((res) => res.json())
-      // .catch(error => {
-      //   console.error("Upload error:", error.response);
-      // })
+      if(response){
+        setSections([...sections, { id: response.id, section_name:response.section_name, videos: [] }]);
+        setSectionName('');
+        setShowInput(false);
+      }
 
-      // setSections([...sections, { id: Date.now(), title: sectionName, videos: [] }]);
-      // setSectionName('');
-      // setShowInput(false);
     }
 
   };
 
-  const handleUploadVideo = (sectionId) => {
-    if (videoTitle.trim() && videoFile) {
-      const updatedSections = sections.map(section => {
-        if (section.id === sectionId) {
-          return {
-            ...section,
-            videos: [...section.videos, { id: Date.now(), title: videoTitle, file: videoFile }]
-          };
-        }
-        return section;
-      });
-      setSections(updatedSections);
+
+
+   const handleCancelUpload = () => {
+    if (currentUpload) {
+      currentUpload.abort();
+      setCurrentUpload(null);
+      setIsUploading(false);
+      setUploadProgress(0);
       setVideoTitle('');
       setVideoFile(null);
-      setActiveVideoSection(null);
     }
   };
+
+
+
+  const handleUploadVideo = async(sectionId:any) => {
+
+
+    if (videoTitle.trim() && videoFile) {
+
+      setLoading(true);
+      const res = await UploadCourseVideo({
+        video_title: videoTitle,
+        section_id: sectionId,
+      });
+
+      setLoading(false);
+
+      try {            
+      
+        const upload = new tus.Upload(videoFile, {
+          endpoint: 'https://video.bunnycdn.com/tusupload',
+          retryDelays: [0, 3000, 5000, 10000, 20000, 60000, 60000],
+          headers: {
+            AuthorizationSignature: res.uploadSignature,
+            AuthorizationExpire: res.uploadExpire,
+            LibraryId: res?.libraryId,
+            VideoId: res?.videoId,
+          },
+          metadata: {
+            filetype: videoFile.type,
+            title: videoTitle,
+            collection: res?.collectionId, // Optional collection ID
+          },  
+          onError: function(error) {
+            console.log(error)
+          },
+          onProgress: function(bytesUploaded, bytesTotal) {
+            const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+            console.log(`Uploading video.....${percentage}%`);
+          },
+          onSuccess: () => {
+            console.log('completed');
+
+            setSections(prevSections => 
+              prevSections.map(section => {
+                if (section.id === sectionId) {
+                  return {
+                    ...section,
+                    videos: [
+                      ...section.videos, 
+                      { 
+                        id: res?.videoId || Date.now(), 
+                        video_title: videoTitle, 
+                        file: videoFile 
+                      }
+                    ]
+                  };
+                }
+                return section;
+              })
+            );
+
+            setVideoTitle('');
+            setVideoFile(null);
+            setActiveVideoSection(null);
+              
+          },
+        })
+
+        upload.findPreviousUploads().then((previousUploads) => {
+            if (previousUploads.length) {
+              upload.resumeFromPreviousUpload(previousUploads[0]);
+            }
+            upload.start();
+        });
+      
+      
+      } catch (err) {
+          console.error(err);
+          // setMessage('Something went wrong during upload.');
+      } finally {
+          // setUploading(false);
+      }
+
+
+    }
+  };
+
+
+
+
 
   return (
     <div className="max-w-4xl p-6 ">
@@ -71,16 +159,15 @@ const VideoSectionsUI = ({courseId}:{courseId:string}) => {
             className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden"
           >
             <div className="bg-slate-100 px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">{section.title}</h2>
+              <h2 className="text-lg font-semibold text-slate-800">{section.section_name}</h2>
             </div>
-            
             <div className="p-6">
               {section.videos.length > 0 ? (
                 <div className="space-y-4">
                   {section.videos.map((video, index) => (
                     <div key={video.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-md border border-slate-200">
                       <Video className="text-blue-500" size={20} />
-                      <h3 className="font-medium text-slate-700">{video.title}</h3>
+                      <h3 className="font-medium text-slate-700">{video.video_title}</h3>
                       <span className="text-sm text-slate-500 ml-auto">
                         {video.file ? video.file.name : "File uploaded"}
                       </span>
@@ -125,24 +212,36 @@ const VideoSectionsUI = ({courseId}:{courseId:string}) => {
                             setVideoTitle('');
                             setVideoFile(null);
                           }}
-                          className="px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition"
+                          className="px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition hover:cursor-pointer"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={() => handleUploadVideo(section.id)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition flex items-center gap-2"
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition flex items-center gap-2 cursor-pointer"
                           disabled={!videoTitle.trim() || !videoFile}
                         >
-                          <Upload size={16} />
-                          Upload Video
+                          {!loading && 
+                            <>
+                              <Upload size={16} />
+                              Upload Video
+                            </>
+                          }
+                          
+                          {loading && 
+                            <>
+                              Processing
+                              <div className="w-3.5 h-3.5 border-2 border-white border-l-transparent rounded-full animate-spin" />
+                            </>                          
+                          }
+                          
                         </button>
                       </div>
                     </div>
                   ) : (
                     <button 
                       onClick={() => setActiveVideoSection(section.id)} 
-                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium mt-4"
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium mt-4 cursor-pointer"
                     >
                       <Plus size={16} />
                       Add Another Video
@@ -165,7 +264,7 @@ const VideoSectionsUI = ({courseId}:{courseId:string}) => {
                       </div>
                       
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Upload Video File</label>
+                        <label className="block text-sm font-medium text-slate- 700 mb-1">Upload Video File</label>
                         <div className="flex items-center gap-2">
                           <label className="flex-1 cursor-pointer text-center px-4 py-2 border border-dashed border-slate-300 rounded-md hover:border-blue-500 transition">
                             <div className="flex items-center justify-center gap-2 text-slate-500 hover:text-blue-600">
@@ -241,7 +340,7 @@ const VideoSectionsUI = ({courseId}:{courseId:string}) => {
             <button 
               onClick={handleSectionCreate}
               disabled={!sectionName.trim()}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Create Section
             </button>
@@ -250,7 +349,7 @@ const VideoSectionsUI = ({courseId}:{courseId:string}) => {
                 setShowInput(false);
                 setSectionName('');
               }}
-              className="p-2 text-slate-500 hover:text-slate-700 rounded-md hover:bg-slate-100 transition"
+              className="p-2 text-slate-500 hover:text-slate-700 rounded-md hover:bg-slate-100 transition cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -259,7 +358,7 @@ const VideoSectionsUI = ({courseId}:{courseId:string}) => {
       ) : (
         <button
           onClick={() => setShowInput(true)}
-          className="mt-6 flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-blue-600 hover:bg-slate-50 rounded-lg shadow-sm transition"
+          className="mt-6 flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-blue-600 hover:bg-slate-50 rounded-lg shadow-sm transition cursor-pointer"
         >
           <Plus size={18} />
           <span className="font-medium">Add Section</span>
