@@ -266,7 +266,7 @@ export async function CreateSession(data:any){
 
 export async function CreateCourseSection(data:any){
 
-  const res = await apiService.post('/course/create-section/', {
+  const res = await apiService.post('/course/section/', {
     requiresAuth: true,
     body: JSON.stringify(data)
   }).catch((error)=> {
@@ -346,5 +346,22 @@ export async function SessionRequestsAccept(id:string){
 
 
   return res;
+
+}
+
+
+
+export async function BuyCourse(data:any){
+
+  const res = await apiService.post('/payment/course-pay/', {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
+    console.log(error)
+  })
+
+  if(res?.msg==="payment successfull"){
+    redirect(`/my-courses/${data.course_id}`)
+  }
 
 }

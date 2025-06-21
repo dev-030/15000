@@ -31,20 +31,20 @@ export default function CourseCard ({ course }:any){
       
       <div className="relative w-full aspect-[16/9]">
         <Image
-          src={course.image}
-          alt={course.title}
+          src={"https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fi.pinimg.com%2F736x%2Fca%2Fbe%2F8a%2Fcabe8ae261107483f3253ae5dce30830.jpg&sp=1750188949T91f2f99478fca59d283ba148214712a17bc650b02a2ad3fc81b752fc6393da99"}
+          alt={course.course_name}
           fill
           className="object-cover"
         />
       </div>
 
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-700 text-base line-clamp-2">{course.title}</h3>
-        <p className="text-sm text-gray-500 mt-1">{course.instructor}</p>
+        <h3 className="font-semibold text-gray-700 text-base line-clamp-2">{course.course_name}</h3>
+        <p className="text-sm text-gray-500 mt-1">{course?.instructor}</p>
 
         <div className="mt-auto pt-4 flex items-center justify-between text-gray-600 text-sm">
-          <Rating score={course.rating} reviews={course.reviews} />
-          <span className="font-semibold text-gray-800">${course.price.toFixed(2)}</span>
+          <Rating score={course?.rating} reviews={course?.reviews} />
+          <span className="font-semibold text-gray-800">${course.course_price}</span>
         </div>
       </div>
     </div>

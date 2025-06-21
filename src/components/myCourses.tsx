@@ -3,6 +3,7 @@ import Link from "next/link";
 import CourseCard from "./courseCard";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { apiService } from "@/lib/actions/api";
 
 
 
@@ -12,10 +13,10 @@ export default async function MyCoursesComponent(){
 
     if(!user) return redirect('/login');
 
-    const data = await fetch('https://frontend.edcluster.com/api/courses',{
-        method: 'GET',
+
+    const data = await apiService.get('/client/my-courses/',{
+        requiresAuth: true
     })
-    .then((res) => res.json())
     .catch((error) => {
         console.error({"ERROR":error.message});
     })
@@ -24,7 +25,7 @@ export default async function MyCoursesComponent(){
   return(
     <div>
 
-        {data ? (
+        {data?.length > 0 ? (
             <div>
 
                 <div className="mb-8">
@@ -54,7 +55,7 @@ export default async function MyCoursesComponent(){
                                 </span>
                             </div>
                             <h3 className="mt-2 text-md font-semibold">
-                                {course.title}
+                                {course.course_name}
                             </h3>
                             <p className="text-sm text-gray-600 pt-2">By {course.instructor}</p>
                             <div className="mt-2 text-sm text-gray-500">
@@ -74,7 +75,7 @@ export default async function MyCoursesComponent(){
                                 </div>
                             </div>
                             <div className="mt-3">
-                                <Link href={'/my-courses/10291'} className="px-4 py-1 text-sm bg-blue-600 text-white rounded">
+                                <Link href={`/my-courses/${course.id}`} className="px-4 py-1 text-sm bg-blue-600 text-white rounded">
                                     {course.status === 'Completed' ? 'Review' : course.progress > 0 ? 'Continue' : 'Start'}
                                 </Link>
                             </div>

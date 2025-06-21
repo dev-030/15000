@@ -5,8 +5,9 @@
 // import shaka from 'shaka-player';
 
 import VideoList from "@/components/VideoList";
+import VideoPlayer from "@/components/videoPlayer";
+import { apiService } from "@/lib/actions/api";
 import { redirect } from "next/navigation";
-
 
 
 
@@ -16,35 +17,27 @@ export default async function CoursePage({ params, searchParams }: {params: { co
     const { slug } = await params;
     const {video} = await searchParams;
 
-    // console.log({slug, video})
 
-    //   if (!video && courseData.videos.length > 0) {
-    //     redirect(`/my-courses/${params.courseId}?video=${courseData.videos[0].id}`);
-    //   }
+    const response = await apiService.get(`/course/course-info-all-users/${slug}/`, {
+      cache: 'no-cache',
+    });
 
 
-    // if there aren't any search params and there are videos, redirect to the first video
-    if (!video) {
-        redirect(`/my-courses/${slug}?video=2kne398`);
+    if (!video && response?.sections[0].videos.length > 0) {
+        redirect(`/my-courses/${slug}?video=${response.sections[0].videos[0].id}`);
     }
 
-    console.log(!video)
 
+    
     return(
 
         <div className="min-h-screen flex items-center gap-3 w-full">
 
-            <div className="relative bg-amber-100 border border-amber-300 p-10 rounded-md w-4/5">
-                <iframe src="https://iframe.mediadelivery.net/embed/450619/49644ba1-3e50-47e6-9cd7-cb3374cf8537?autoplay=true&loop=false&muted=false&preload=true&responsive=true" loading="lazy" className="border-none top-0 h-96 w-full" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
-            </div>
+            <VideoPlayer videoId={video as string}/>
 
 
-            <div className="bg-gray-100 border border-gray-300 p-10 rounded-md max-w-1/5">
-                <h1>Video play list sections</h1>
-                <h1>course id : {slug}</h1>
-                <h1>video id : {video}</h1>
-
-                <VideoList currentVideoId={video}/>
+            <div className="bg-gray-100 border border-gray-300 p-10 rounded-md max-w-2/5">
+                <VideoList currentVideoId={video} data={response}/>
             </div>  
             
         </div>

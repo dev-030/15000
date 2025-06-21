@@ -1,6 +1,7 @@
 import axios from "axios";
 import Link from "next/link";
 import CourseCard from "./courseCard";
+import { apiService } from "@/lib/actions/api";
 
 
 
@@ -8,15 +9,9 @@ import CourseCard from "./courseCard";
 
 export default async function CourseList({params}:any){
 
-    
-    const data = await fetch('https://frontend.edcluster.com/api/courses',{
-        method: 'GET',
-    })
-    .then((res) => res.json())
-    .catch((error) => {
+    const data = await apiService.get('/client/courses/').catch((error) => {
         console.error({"ERROR":error.message});
     })
-
 
     return (
         <>

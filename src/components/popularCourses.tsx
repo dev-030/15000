@@ -1,18 +1,15 @@
 import { Star } from "lucide-react";
 import Link from "next/link";
 import CourseCard from "./courseCard";
+import { apiService } from "@/lib/actions/api";
 
 
 
 
 export default async function PopularCourses(){
 
-  const data = await fetch('https://frontend.edcluster.com/api/courses',{
-      method: 'GET',
-  })
-  .then((res) => res.json())
-  .catch((error) => {
-    console.error({"ERROR":error.message});
+  const data = await apiService.get('/client/courses/').catch((error) => {
+      console.error({"ERROR":error.message});
   })
 
   return(
