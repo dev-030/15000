@@ -26,7 +26,7 @@ const links: LinkItem[] = [
     { name: "Become a Mentor", href: "/onboarding", icon: SquareUserRound, requiresAuth: true }
 ];
 
-export default function RootSideBar(){
+export default function RootSideBar({state, setState}:{state:boolean, setState:React.Dispatch<React.SetStateAction<boolean>>}){
 
     const user = useClientSession();
 
@@ -46,7 +46,7 @@ export default function RootSideBar(){
 
                 <nav className="flex flex-col gap-2">
                    {visibleLinks.map((link) => (
-                        <Link 
+                        <Link onClick={()=> setState(!state)}
                         key={link.name}
                         href={link.href}
                         className={clsx("flex items-center gap-2 py-2.5 px-3 rounded-md text-[15px] hover:bg-slate-50",

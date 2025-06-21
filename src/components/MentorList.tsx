@@ -23,7 +23,7 @@ export default async function MentorList({params}:any) {
             
             <h1 className="text-xl text-gray-700 font-bold mb-4 mt-10">Book Mentors</h1>
 
-            <div className="grid grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
                 {data?.map((instructor:any) => (
                    <div key={instructor.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 w-fit transition duration-300">
 

@@ -10,7 +10,6 @@ import { redirect } from 'next/navigation';
 export default async function Sessions () {
  
   const user = await auth();
-  if(!user) redirect('/login');
 
   return (
     <div className="min-h-screen">
