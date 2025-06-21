@@ -47,7 +47,7 @@ export default function SessionManagement() {
         ) : data?.results && data.results.length > 0 ? (
           <div>
 
-            <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-lg">
+            <div className="flex flex-wrap space-y-3 justify-between items-center mb-10 bg-white p-6 rounded-lg">
                 <div>
                   <h1 className="text-xl font-semibold text-gray-800">Manage Your Sessions</h1>
                   <p className="text-sm text-gray-600">Create and manage your mentoring sessions</p>

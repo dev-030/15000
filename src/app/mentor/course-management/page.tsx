@@ -25,7 +25,7 @@ export default async function CourseManagement() {
 
                 <div>
 
-                    <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-lg">
+                    <div className="flex flex-wrap space-y-3 justify-between items-center mb-10 bg-white p-6 rounded-lg">
                         <div>
                             <h1 className="text-xl font-semibold text-gray-800">Manage Your Courses</h1>
                             <p className="text-sm text-gray-600">Create and manage your course</p>

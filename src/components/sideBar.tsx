@@ -24,7 +24,7 @@ const links: LinkItem[] = [
     { name: "Earnings", href: "#", icon: Wallet },
 ];
 
-export default function SideBar(){
+export default function SideBar({state, setState}:{state:boolean, setState:React.Dispatch<React.SetStateAction<boolean>>}){
 
     const pathname = usePathname();
 
@@ -32,9 +32,14 @@ export default function SideBar(){
         <div>
             <aside className="w-60 px-3 pt-4 ">
                 <a href="/mentor/dashboard" className="text-3xl font-bold text-blue-500">edcluster</a>
-                <nav className="flex flex-col gap-1.5 mt-20">
+
+                <div className="text-3xl font-bold text-blue-500 pt-10 min-[700px]:hidden">
+                    <a href="/mentor/dashboard" className="text-3xl font-bold text-blue-500">edcluster</a>
+                </div>
+
+                <nav className="flex flex-col gap-1.5 mt-20 max-[700px]:mt-10">
                 {links.map((link) => (
-                        <Link 
+                        <Link onClick={()=> setState(!state)}
                         key={link.name}
                         href={link.href}
                         className={clsx("flex items-center gap-2 py-2.5 px-3 rounded-md text-[15px] hover:bg-slate-50",

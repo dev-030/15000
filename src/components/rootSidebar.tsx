@@ -32,12 +32,10 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
 
     const pathname = usePathname();
 
-
     const visibleLinks = links.filter(link => {
-        if (link.requiresAuth) {
-            return user; 
-        }
-        return true; 
+        if (link.requiresAuth && !user) return false;
+        if (link.href === "/onboarding" && user?.user?.role === 'mentor') return false;
+        return true;
     });
 
     return(

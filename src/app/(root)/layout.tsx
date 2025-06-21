@@ -2,7 +2,7 @@
 import Navbar from "@/components/navbar";
 import RootSideBar from "@/components/rootSidebar";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 
@@ -10,8 +10,20 @@ export default function AppLayout({children}:{children:React.ReactNode}){
 
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(0);
 
-    const showSidebar = pathname === '/' || pathname === '/courses' || pathname === '/mentors' || pathname === '/my-courses' || pathname === '/sessions' || pathname === '/saved';
+    const showSidebar = pathname === '/' || pathname === '/courses' || pathname === '/mentors' || pathname === '/my-courses' || pathname === '/sessions' || pathname === '/saved' || windowWidth <=700 && pathname === '/onboarding';
+
+
+    useEffect(() => {
+        function handleResize() {
+        setWindowWidth(window.innerWidth);
+        }
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
 
     return(
 
@@ -21,12 +33,14 @@ export default function AppLayout({children}:{children:React.ReactNode}){
                 <Navbar state={isOpen} setState={setIsOpen}/>
             </div>
 
-            <div className="flex mt-[3.5rem]">
+            <div className="flex mt-[3.3rem]">
 
                 <div className={`fixed overflow-y-auto min-h-full border-r-[1px] border-r-gray-300 bg-white z-50 transition-transform duration-300 ease-in-out
-                    ${showSidebar ? `max-[700px]:${isOpen ? 'translate-x-0 mt-[-2px]' : '-translate-x-full'}`:'hidden'}`}>
+                    ${showSidebar ? `${windowWidth <=700 ? `${isOpen ? 'translate-x-0':'-translate-x-full'}`:''}`:'hidden'}`}>
                     <RootSideBar state={isOpen} setState={setIsOpen}/>
                 </div>
+
+
 
                 {isOpen && showSidebar && (
                     <div className="fixed inset-0 z-30 bg-black/50 min-[700px]:hidden mt-13.5"
