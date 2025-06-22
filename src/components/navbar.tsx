@@ -54,9 +54,9 @@ export default function Navbar({state, setState}:{state:boolean, setState:React.
                         <Link href="/login" className="bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-600 transition">
                             Login
                         </Link>
-                        {/* <Link href="/register" className="text-gray-700 text-sm font-medium border border-gray-400 px-4 py-2 rounded-md hover:bg-gray-100 transition">
+                        <Link href="/register" className="text-gray-700 text-sm font-medium border border-gray-400 px-4 py-2 rounded-md hover:bg-gray-100 transition max-[700px]:hidden">
                             Register
-                        </Link> */}
+                        </Link>
                     </>
                     ):(
                     <>
