@@ -32,6 +32,12 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
                 <SideBar state={isOpen} setState={setIsOpen}/>
             </div>
 
+            {isOpen && (
+                <div className="fixed inset-0 z-30 bg-black/50 min-[700px]:hidden mt-13.5"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
             <main className=" max-[700px]:ml-0 ml-60 w-screen">
                 
                 <div className="sticky top-0 z-50 bg-white px-4 flex items-center max-[700px]:justify-between justify-end w-full gap-2 py-2 border-b-[1px] border-b-gray-300">

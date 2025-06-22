@@ -58,6 +58,22 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
                    )}
                 </nav>
 
+                {!user && (
+                    <div className="grid gap-2 mt-10">
+
+                        <Link href="/login" className="bg-blue-500 text-white text-center text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            Login
+                        </Link>
+
+                        <Link href="/register" className="text-gray-700 text-sm text-center font-medium border border-gray-400 px-4 py-2 rounded-md hover:bg-gray-100 transition">
+                            Register
+                        </Link>
+
+                    </div>
+                )}
+                
+                 
+
             </aside>
         </>
     )
