@@ -27,19 +27,18 @@ export default async function CoursePage({ params, searchParams }: {params: { co
         redirect(`/my-courses/${slug}?video=${response.sections[0].videos[0].id}`);
     }
 
-
     
     return(
 
-        <div className="min-h-screen flex items-center gap-3 w-full">
+        <div className="min-h-screen p-6 md:p-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white p-4 sm:p-6 rounded-lg shadow">
+                <VideoPlayer videoId={video as string} />
+            </div>
 
-            <VideoPlayer videoId={video as string}/>
-
-
-            <div className="bg-gray-100 border border-gray-300 p-10 rounded-md max-w-2/5">
-                <VideoList currentVideoId={video} data={response}/>
-            </div>  
-            
+            <aside className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200 lg:col-span-1 max-h-[90vh] overflow-y-auto">
+                <h2 className="text-xl font-semibold text-gray-700 mb-4">Course Content</h2>
+                <VideoList currentVideoId={video as string} data={response} />
+            </aside>
         </div>
         
     )

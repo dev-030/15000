@@ -1,79 +1,172 @@
 'use client'
 import { BuyCourse } from "@/lib/actions/actions";
-import { ChevronDown, CirclePlay, Heart, Star } from "lucide-react";
+import { ChevronDown, CirclePlay, Star, Award, BookOpen } from "lucide-react";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 
-
-
-
-export default function CourseDetails(){
-
+export default function CourseDetails() {
     const params = useParams();
-    
-    const {data} = useSWR(`/api/courses/${params.slug}`, (url: string) =>
+    const { data } = useSWR(`/api/courses/${params.slug}`, (url) =>
         fetch(url).then((res) => res.json())
     );
 
-    return(
+    const courseData = data;
 
-        <div className="flex gap-10 w-full">
+    const totalLectures = courseData?.sections?.reduce((total, section) =>
+        total + (section.total_lecture || section.videos?.length || 0), 0
+    );
 
-            <div className="bg-white p-20 rounded-xl border border-gray-400 w-2/3">
-                <h1>{data?.course_name}</h1>
-                <p>{data?.course_description}</p>
-                <div className="flex bg-amber-500 gap-2 items-center">   
-                    {/* <p>{data?.rating.value}</p> 
-                    <p>{data?.rating.count}</p> */}
-                </div>
-                
-                <div className="w-full max-w-md mx-auto mt-10 divide-y-[0.3px] divide-gray-600 border-[0.3px] border-gray-600">
-                    {data?.sections.map((item:any) => (
+    const totalDuration = courseData?.sections?.reduce((total, section) =>
+        total + (section.total_duration || 30), 0
+    );
 
-                        <details key={item.id} className="group motion-safe:transition-all motion-safe:duration-300">
-
-                            <summary className="flex items-center justify-between cursor-pointer list-none p-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="ml-2 text-gray-500 transition-transform motion-safe:duration-300 group-open:rotate-180">
-                                        <ChevronDown />           
-                                    </span>
-                                    <span className="text-gray-800 font-medium">
-                                        {item.section_name}
-                                    </span>
+    return (
+        <div className="min-h-screen bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {/* Responsive grid: stack on mobile, 2 columns on md, 3 on lg */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Main Content */}
+                    <div className="md:col-span-2 space-y-8">
+                        {/* Course Header */}
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
+                                {courseData?.course_name}
+                            </h1>
+                            <p className="text-gray-400 text-sm leading-relaxed mb-4 sm:mb-6">
+                                {courseData?.course_description}
+                            </p>
+                            {/* Rating */}
+                            <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                                <div className="flex">
+                                    {[1,2,3,4,5].map((star) => (
+                                        <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                    ))}
                                 </div>
-
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                    <p>{item.total_lecture} lectures</p>
-                                    <p>{item.total_duration}min</p>
-                                </div>
-                            </summary>
-
-
-                            <div className="text-gray-600 space-y-4 bg-white p-4 border-t-[0.3px]">
-                                {item.videos.map((content:any) => (
-                                    <div key={content.id} className="flex items-center justify-between gap-2 text-sm ml-10">
-                                        <div className="flex items-center gap-2">
-                                            <CirclePlay size={20}/>
-                                            <h1>{content.video_title}</h1>
-                                        </div>
-                                        <p>{content?.length}</p>
-                                    </div>
-                                ))}
-                            
+                                <span className="text-yellow-400 text-sm">(286 ratings)</span>
                             </div>
-                        </details>
-                    ))}
+                        </div>
+
+                        {/* Course Content */}
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Course content</h2>
+                            <p className="text-gray-400 text-sm mb-4 sm:mb-6">
+                                {courseData?.sections?.length} sections • {totalLectures} lectures • {Math.floor(totalDuration / 60)}h {totalDuration % 60}m total length
+                            </p>
+                            <div className="space-y-2">
+                                {courseData?.sections?.map((section, index) => (
+                                    <details
+                                        key={section.id}
+                                        className="group border border-gray-200 rounded-md overflow-hidden"
+                                        open={index === 0}
+                                    >
+                                        <summary className="flex items-center justify-between cursor-pointer list-none p-3 sm:p-4 hover:bg-gray-100 transition-colors">
+                                            <div className="flex items-center gap-2 sm:gap-3">
+                                                <ChevronDown className="w-4 h-4 text-gray-400 transition-transform duration-200 group-open:rotate-180" />
+                                                <span className="font-semibold text-sm sm:text-base">
+                                                    {section.section_name}
+                                                </span>
+                                            </div>
+                                            <span className="text-xs sm:text-sm text-gray-400">
+                                                {section.total_lecture || section.videos?.length} lectures • {section.total_duration}min
+                                            </span>
+                                        </summary>
+                                        <div className="border-t border-gray-200">
+                                            {section.videos?.map((video) => (
+                                                <div
+                                                    key={video.id}
+                                                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 pl-8 sm:pl-12 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                                                >
+                                                    <CirclePlay className="w-4 h-4 text-gray-400" />
+                                                    <span className="flex-1 text-xs sm:text-sm">
+                                                        {video.video_title}
+                                                    </span>
+                                                    <span className="text-xs sm:text-sm text-gray-400">
+                                                        {video.duration || '15:30'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </details>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Instructor */}
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Instructor</h2>
+                            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 border border-gray-200 p-3 rounded-md">
+                                <img
+                                    src={courseData?.mentor?.profile_pic}
+                                    alt={courseData?.mentor?.full_name}
+                                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover mx-auto sm:mx-0"
+                                />
+                                <div className="flex-1">
+                                    <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-2">
+                                        {courseData?.mentor?.full_name}
+                                    </h3>
+                                    <p className="text-gray-400 text-sm leading-relaxed py-2">
+                                        {courseData?.mentor?.about}
+                                    </p>
+                                    <div className="flex flex-wrap gap-4 text-xs sm:text-sm text-gray-400 mb-2 sm:mb-4">
+                                        <div className="flex items-center gap-1">
+                                            <Star className="w-4 h-4" />
+                                            <span>4.3 Instructor Rating</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Award className="w-4 h-4" />
+                                            <span>{courseData?.mentor?.total_students} Students</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <BookOpen className="w-4 h-4" />
+                                            <span>{courseData?.mentor?.total_courses} Courses</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Reviews */}
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Reviews</h2>
+                            <div className="flex items-center gap-3 sm:gap-4">
+                                <div className="flex">
+                                    {[1,2,3,4,5].map((star) => (
+                                        <Star key={star} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                                    ))}
+                                </div>
+                                <span className="text-base sm:text-lg">4.5 rating</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="md:col-span-1 order-first md:order-none">
+                        <div className="sticky top-6 space-y-6">
+                            {/* Course Preview Card */}
+                            <div className="border border-gray-200 rounded-lg overflow-hidden">
+                                <div className="relative">
+                                    <img
+                                        src={courseData?.thumbnail}
+                                        alt={courseData?.course_name}
+                                        className="w-full h-40 sm:h-48 object-cover"
+                                    />
+                                </div>
+                                <div className="p-4 sm:p-6">
+                                    <div className="flex items-center gap-1 text-lg font-semibold text-gray-600 mb-3 sm:mb-4">
+                                        ৳ <span>{courseData?.course_price}</span>
+                                    </div>
+                                    <button
+                                        onClick={() => BuyCourse({ course_id: courseData.id })}
+                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded transition-colors mb-3 sm:mb-4 cursor-pointer"
+                                    >
+                                        Enroll
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-
             </div>
-
-            <div className="bg-white p-20 rounded-xl border border-gray-400">
-                <h1>right part</h1>
-                <button onClick={()=>BuyCourse({course_id:data.id})} className="bg-blue-600 p-3 rounded-lg text-white mt-2 cursor-pointer">Buy Course</button>
-            </div>
-
-
         </div>
-    )
+    );
 }

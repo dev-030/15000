@@ -5,7 +5,9 @@ import { CreateCourseSection, UploadCourseVideo } from '@/lib/actions/actions';
 import * as tus from 'tus-js-client'; 
 
 const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
-  const [sections, setSections] = useState(data || []);
+
+
+  const [sections, setSections] = useState(data?.sections || []);
   const [showInput, setShowInput] = useState(false);
   const [sectionName, setSectionName] = useState('');
   const [activeVideoSection, setActiveVideoSection] = useState(null);
@@ -15,6 +17,8 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [currentUpload, setCurrentUpload] = useState(null);
+  const [videoLink, setVideoLink] = useState('');
+
 
 
   const handleSectionCreate = async() => {
@@ -32,6 +36,8 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
     }
   };
 
+
+
   const handleCancelUpload = () => {
     if (currentUpload) {
       currentUpload.abort().then(()=>{
@@ -47,18 +53,48 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
     }
   };
 
+
+
   const handleUploadVideo = async(sectionId:any) => {
 
     if (videoTitle.trim() && videoFile) {
       setLoading(true);
+
       const res = await UploadCourseVideo({
         video_title: videoTitle,
         section_id: sectionId,
+        // yt_link: videoLink
       });
 
-      setLoading(false);
+      // if(data.is_paid){
+      //   setSections(prevSections => 
+      //     prevSections.map(section => {
+      //       if (section.id === sectionId) {
+      //         return {
+      //           ...section,
+      //           videos: [
+      //             ...section.videos, 
+      //             { 
+      //               id: res?.videoId || Date.now(), 
+      //               video_title: videoTitle, 
+      //               file: videoFile 
+      //             }
+      //           ]
+      //         };
+      //       }
+      //       return section;
+      //     })
+      //   );
 
-      console.log(res,'from upload page 🔴');
+      //   setVideoTitle('');
+      //   setVideoFile(null);
+      //   setActiveVideoSection(null);
+      //   setIsUploading(false);
+      //   setUploadProgress(0);
+      //   setCurrentUpload(null);
+      // }
+
+      setLoading(false);
 
       if (res) {
         setIsUploading(true);
@@ -142,19 +178,11 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
 
   // Things are wrong here. the uploading functionality is messed up. it cannot upload multiple videos at once. and after starting upload if i start uploading from another section the video just gets transferred to that new section from the old one. Things are fully messed up.
 
+
   return (
     <div className="max-w-4xl p-6 ">
 
       <h1 className="text-2xl font-bold mb-8 text-slate-800">Video Course Manager</h1>
-      
-
-      <div>
-        Things are wrong here. the uploading functionality is messed up. it cannot upload multiple videos at once. and after starting upload if i start uploading from another section the video just gets transferred to that new section from the old one. Things are fully messed up
-      </div>
-
-
-
-
 
       <div className="space-y-6">
         {sections.map((section) => (
@@ -322,6 +350,7 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
                             />
                           </div>
                           
+                          {data.is_paid && (
                           <div className="mb-4">
                             <label className="block text-sm font-medium text-slate-700 mb-1">Upload Video File</label>
                             <div className="flex items-center gap-2">
@@ -339,6 +368,20 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
                               </label>
                             </div>
                           </div>
+                          )}
+
+                          {!data.is_paid && (
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-slate-700 mb-1">Video link</label>
+                              <input
+                                type="text"
+                                value={videoLink}
+                                onChange={(e) => setVideoLink(e.target.value)}
+                                placeholder="Enter video link"
+                                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                              />
+                            </div>
+                          )}
                           
                           <div className="flex justify-end gap-2">
                             <button
@@ -376,7 +419,7 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
                     <div className="text-center py-6">
                       <Video className="mx-auto h-12 w-12 text-slate-400" />
                       <h3 className="mt-2 text-sm font-medium text-slate-900">No videos yet</h3>
-                      <p className="mt-1 text-sm text-slate-500">Upload your first video to this section</p>
+                      <p className="mt-1 text-sm text-slate-500">{data?.is_paid ? "Upload your first video to this section" : "Add your video links to this section"}</p>
                       <div className="mt-6">
                         <button
                           onClick={() => setActiveVideoSection(section.id)}
@@ -394,13 +437,6 @@ const VideoSectionsUI = ({courseId, data}:{courseId:string, data:any}) => {
           </div>
         ))}
       </div>
-
-
-
-
-
-
-
 
 
       {/* Add Section UI */}

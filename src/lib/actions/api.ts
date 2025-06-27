@@ -58,8 +58,8 @@ class RestApi {
             headers,
         });
 
-
         if (!response.ok) {
+            console.log(response);
             throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         }
 
@@ -88,6 +88,14 @@ class RestApi {
         return this.request<T>(endpoint, {
             ...options,
             method: 'PUT',
+            body: data ? JSON.stringify(data) : undefined,
+        });
+    }
+
+    async patch<T>(endpoint: string, data?: any, options?: Omit<ApiOptions, 'method'>) {
+        return this.request<T>(endpoint, {
+            ...options,
+            method: 'PATCH',
             body: data ? JSON.stringify(data) : undefined,
         });
     }

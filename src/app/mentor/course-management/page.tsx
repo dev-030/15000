@@ -4,16 +4,17 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { apiService } from '@/lib/actions/api';
+import Image from 'next/image';
 
 
 export default async function CourseManagement() {  
   
     const response = await apiService.get(`/course/list/`,{
         requiresAuth: true
+    }).catch((error) => {
+        console.error({"ERROR":error.message});
     })
-
-    console.log(response)
-
+    
 
     return (
 
@@ -35,59 +36,35 @@ export default async function CourseManagement() {
                             Create New Courses
                         </Link>
                     </div>
+
                 
                     <div className="flex flex-wrap gap-4">
+
                     {response?.map((course:any) => (
-                        <Link href={`/mentor/course-management/${course.id}`} key={course.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
+                        <Link
+                            href={`/mentor/course-management/${course.id}`}
+                            key={course.id}
+                            className="group bg-white rounded-lg p-1.5 border border-gray-200 hover:border-blue-300 transition-all duration-200 w-full max-w-[300px]"
+                            >
+                            <div className="w-full aspect-video overflow-hidden rounded-lg mb-2">
+                                <Image
+                                src={course.thumbnail}
+                                alt="Course thumbnail"
+                                width={250}
+                                height={225}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                />
+                            </div>
 
-                            <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">{course.course_name}</h3>
 
-                                <h3 className="font-medium text-lg text-gray-700">{course.course_name}</h3>
+                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{course.course_description}</p>
 
-                                <div className="flex items-center gap-2">
-                                <span className={`px-2 py-1 text-xs rounded-full ${course.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-700'}`}>
-                                    {course.isActive ? 'Active' : 'Inactive'}
+                            <div className="flex items-center justify-between mt-3 text-sm text-gray-500">
+                                <span className="text-blue-600 font-medium">
+                                {course.is_paid ? `$${course.course_price}` : 'Free'}
                                 </span>
-                                <button className="text-gray-500 hover:text-gray-700">
-                                    <MoreVertical size={16} />
-                                </button>
-                                </div>
-
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
-                                <div>
-                                <h4 className="text-xs text-gray-600 mb-1">PRICE</h4>
-                                <div className="flex items-center">
-                                    <span className="text-gray-800 text-sm">
-                                    {/* ৳ {course.price.toLocaleString()} */}
-                                    </span>
-                                </div>
-                                </div>
-                                
-                               
-                            </div>
-
-                            <div className="mb-4">
-                                <h4 className="text-xs text-gray-700 mb-1">DESCRIPTION</h4>
-                                <p className="text-sm text-gray-800">
-                                One-on-one mentoring course for web development. Get personalized guidance on HTML, CSS, JavaScript, and modern frameworks. Perfect for beginners and intermediate developers looking to improve their skills.
-                                </p>
-                            </div>
-
-
-                            <div className="flex flex-col sm:flex-row gap-2">
-                                <button className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 rounded-lg flex items-center justify-center cursor-pointer">
-                                <Edit size={15} className="mr-1" /> 
-                                <p className='text-sm'>Manage Availability</p>
-                                </button>
-                                <button className="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-0 rounded-lg flex items-center justify-center cursor-pointer">
-                                <Edit size={15} className="mr-1" /> 
-                                <p className='text-sm'>Edit course</p>
-                                </button>
-                            </div>
-
                         </Link>
                     ))}
                     </div>

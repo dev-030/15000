@@ -21,6 +21,8 @@ export default async function MyCoursesComponent(){
         console.error({"ERROR":error.message});
     })
       
+
+    console.log(data);
       
   return(
     <div>
@@ -38,7 +40,7 @@ export default async function MyCoursesComponent(){
                         <div key={course.id} className="bg-white rounded-lg shadow p-2 border border-gray-200">
                             <div className="relative">
                                 <img
-                                src={course.image}
+                                src={course.thumbnail}
                                 alt={course.title}
                                 className="w-full h-40 object-cover rounded"
                                 />
@@ -57,7 +59,7 @@ export default async function MyCoursesComponent(){
                             <h3 className="mt-2 text-md font-semibold">
                                 {course.course_name}
                             </h3>
-                            <p className="text-sm text-gray-600 pt-2">By {course.instructor}</p>
+                            <p className="text-sm text-gray-600 pt-2">By {course.mentor_name}</p>
                             <div className="mt-2 text-sm text-gray-500">
                                 {course.status === 'Completed' && course.completedAt && (
                                 <p>Completed: {course.completedAt}</p>

@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { bookingSchema } from "../schema";
 import { apiService } from "./api";
+import { auth } from "../auth";
 
 
 
@@ -211,7 +212,7 @@ export async function CreateCourseData(formData:FormData){
 
   const cookie = (await cookies()).get("access_token")?.value;
 
-  console.log("requested🔴")
+  console.log("requested🔴", formData);
   const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create/`, formData, {
     headers: {
       "Content-Type": "application/json",
@@ -221,8 +222,10 @@ export async function CreateCourseData(formData:FormData){
   .then((res) => res.data)
   .catch(error => {
     console.error("Upload error:", error.response);
+    if(error.response.data.error){
+      return error.response.data;
+    }
   })
-
 
   return res;
 
@@ -291,6 +294,23 @@ export async function UploadCourseVideo(data:any){
 
 }
 
+
+
+export async function RescheduleSession(data:any){
+
+  const res = await apiService.post('/mentor/new-time/' , {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
+    console.log(error)
+  })
+
+  return res;
+
+}
+
+
+
 // export async function SessionRequestsData(){
 
 //   const cookie = (await cookies()).get("access_token")?.value;
@@ -330,7 +350,6 @@ export async function SessionRequestsAccept(id:string){
     },
   }).then((res) => res.json())
 
-
   if(res.error){
     const res2 = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/m/api/google/auth/initiate/`,{
       method: 'GET',
@@ -363,5 +382,43 @@ export async function BuyCourse(data:any){
   if(res?.msg==="payment successfull"){
     redirect(`/my-courses/${data.course_id}`)
   }
+
+}
+
+
+export async function IsProfileComplete(){
+
+  const res = await apiService.get('/mentor/is-profile-complete/', {
+    requiresAuth: true,
+  }).catch((error)=> {
+    console.log(error)
+  })
+
+  return res;
+
+}
+
+
+
+export async function UpdateProfile(data:any){
+
+
+  const cookie = (await cookies()).get("access_token")?.value;
+  const session = await auth()
+  const res = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/user-profile/${session?.user.username}/`, {'about':data.bio} , {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${cookie}`,
+    },
+  })
+  .then((res) => res.data)
+  .catch(error => {
+    console.error("Upload error:", error.response);
+    if(error.response.data.error){
+      return error.response.data;
+    }
+  })
+
+  return res;
 
 }

@@ -90,7 +90,7 @@ function generateCalendarGrid(availableDates: string[]): Array<{ date: string | 
 
 
 
-export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_week: string, slug: string, time_blocks: { start_time: string }[] }[] , slug:string}) {
+export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_week: string, slug: string, time_blocks: { start_time: string }[] }[] , data:any}) {
 
 
   // Important : take this from the server side response
@@ -175,7 +175,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
     const result = bookingSchema.safeParse({
       date: selectedDate,
       time: selectedTime,
-      slug: slug,
+      slug: data.id,
       note: note
     })
 
@@ -185,7 +185,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
       return;
     }
 
-    BookSchedule({ selectedDate, selectedTime, slug, note }).then(() => {
+    BookSchedule({ selectedDate, selectedTime, slug: data.id, note }).then(() => {
       setStep("confirmed");
     }).catch((error) => {
       console.error(error);
@@ -246,10 +246,10 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                 <div className='space-y-4 pt-4.5'>
 
                   <div className='flex items-center gap-3'>
-                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" alt="React Course" className="w-9 h-9 rounded-full" />
+                    <img src={data.mentor.profile_pic} alt="React Course" className="w-9 h-9 rounded-full" />
                     <div className='flex flex-col items-start gap-0.5'>
                       <p className='text-xs text-gray-600 font-medium'>Mentor</p>
-                      <h1 className='text-xs font-medium text-gray-800'>Dr. Jane Smith</h1>
+                      <h1 className='text-xs font-medium text-gray-800'>{data.mentor.full_name}</h1>
                     </div>
                   </div>
 
@@ -259,7 +259,7 @@ export default function BookingModal({ timeSlots, slug }: { timeSlots: { day_of_
                     </div>
                     <div className='flex flex-col items-start gap-0.5'>
                       <div className="text-xs text-gray-600 font-medium">Duration</div>
-                      <div className="text-xs font-medium text-gray-800">60 minutes</div>
+                      <div className="text-xs font-medium text-gray-800">{data.duration} minutes</div>
                     </div>
                   </div>
 

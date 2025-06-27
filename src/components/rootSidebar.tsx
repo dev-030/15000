@@ -38,6 +38,8 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
         return true;
     });
 
+    
+
     return(
         <>
             <aside className="w-60 px-3 pt-4">

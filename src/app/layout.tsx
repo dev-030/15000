@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { auth } from "@/lib/auth";
 import { SessionProvider } from "@/context/sessionProvider";
 import { Geist } from "next/font/google";
+import LockScreen from "@/components/lockScreen";
 
 
 const geistSans = Geist({
@@ -26,7 +27,9 @@ export default async function RootLayout({ children}: Readonly<{children: React.
     <html lang="en">
       <body className={`${geistSans.className} antialiased`}>
         <SessionProvider session={session}>
-          {children}
+          <LockScreen>
+            {children}
+          </LockScreen>
         </SessionProvider>
         {/* <Analytics /> */}
         {/* <SpeedInsights /> */}

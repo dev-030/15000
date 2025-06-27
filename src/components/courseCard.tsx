@@ -31,7 +31,7 @@ export default function CourseCard ({ course }:any){
       
       <div className="relative w-full aspect-[16/9]">
         <Image
-          src={"https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fi.pinimg.com%2F736x%2Fca%2Fbe%2F8a%2Fcabe8ae261107483f3253ae5dce30830.jpg&sp=1750188949T91f2f99478fca59d283ba148214712a17bc650b02a2ad3fc81b752fc6393da99"}
+          src={course?.thumbnail}
           alt={course.course_name}
           fill
           className="object-cover"

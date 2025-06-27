@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 // interface Session {
@@ -157,6 +158,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
 
+  const router = useRouter();
 
 
 
@@ -184,7 +186,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
 
-    // console.log(data.results)
+    console.log(data.results)
 
     const timeRemaining = (targetTime: string) => {
       const now = new Date(); // Local time
@@ -231,13 +233,13 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
       {data?.results?.map((data:any)=>(
-        <div key={data.id} className="bg-white rounded-lg shadow p-6 mb-3">
+        <div key={data?.id} className="bg-white rounded-lg shadow p-6 mb-3">
 
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
                 <div className='h-20 w-20 relative'>
                     <Image
-                        src={data.mentor_pic}
+                        src={data?.mentor_pic}
                         alt={'image'}
                         fill
                         className="rounded-full mr-4 object-cover"
@@ -245,15 +247,14 @@ export default function BookedSessionsCard ({data}:{data:any}) {
                 </div>
               
               <div>
-                <h3 className="text-lg font-semibold">{data.consultancy_name}</h3>
-                <p className="text-gray-600">with {data.mentor_name}</p>
+                <h3 className="text-lg font-semibold">{data?.consultancy_name}</h3>
+                <p className="text-gray-600">with {data?.mentor_name}</p>
               </div>
             </div>
             <span className={`flex items-center px-3 py-1 rounded-full text-sm font-medium text-yellow-800 bg-yellow-100`}>
                 <AlertCircle size={16} className="mr-1"/>
                 Pending
             </span>
-            {/* <StatusBadge status={session.status} /> */}
           </div>
 
           <div className="mt-4 flex items-center justify-between gap-4">
@@ -263,11 +264,11 @@ export default function BookedSessionsCard ({data}:{data:any}) {
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Clock size={18} />
-              <span>{data.duration_min} minutes</span>
+              <span>{data?.duration_min} minutes</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <span>৳</span>
-              <span>{data.duration_min} taka</span>
+              <span>{data?.duration_min} taka</span>
             </div>             
 
           </div>
@@ -278,20 +279,11 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
                 <h1>Accepted session</h1>
 
-                  <Link href={data.meet_link} className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center'>
-                    <ArrowRight size={16} className="ml-2" />
-                    Join Session
-                  </Link>
-
-                {/* <h1>{timeRemaining(data.scheduled_at).days} days {timeRemaining(data.scheduled_at).hours} hours {timeRemaining(data.scheduled_at).minutes} minutes</h1> */}
-
-                {/* <button
-                  onClick={handleJoin}
-                  disabled={!joinEnabled}
-                  className={`${joinEnabled ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'} flex items-center px-4 py-2 rounded`}
-                >
-                  Join Session <ArrowRight size={16} className="ml-2" />
-                </button> */}
+                <button onClick={()=>router.push(data?.meet_link)} className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center cursor-pointer'>
+                  <ArrowRight size={16} className="ml-2" />
+                  Join Session
+                </button>
+                
               </>
             ) : data.status === 'R' ? (
               <div className="text-yellow-600 italic w-full text-center">Waiting for mentor approval</div>

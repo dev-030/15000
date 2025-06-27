@@ -3,9 +3,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconType } from "react-icons";
-import { RxDashboard } from "react-icons/rx";
-import { IoBookOutline } from "react-icons/io5";
-import { CalendarDays, LayoutGrid, LayoutPanelLeft, MonitorCog, Radio, Video, Wallet } from "lucide-react";
+import { CalendarDays, LayoutPanelLeft, MonitorCog, Video, Wallet } from "lucide-react";
 
 
 
@@ -24,7 +22,7 @@ const links: LinkItem[] = [
     { name: "Earnings", href: "#", icon: Wallet },
 ];
 
-export default function SideBar({state, setState}:{state:boolean, setState:React.Dispatch<React.SetStateAction<boolean>>}){
+export default function SideBar({state, setState, isProfileComplete}:{state:boolean, setState:React.Dispatch<React.SetStateAction<boolean>>, isProfileComplete:boolean}){
 
     const pathname = usePathname();
 
@@ -53,6 +51,12 @@ export default function SideBar({state, setState}:{state:boolean, setState:React
                 )}
                 </nav>
 
+
+                {!isProfileComplete &&
+                    <div className="bg-red-50 border border-red-200 text-gray-500 text-sm font-medium px-4 py-4 rounded-md mt-10 flex items-center gap-2">
+                        <p>Please complete your profile for creating course and mentorships.</p>
+                    </div>
+                }
                
             </aside>
         </div>

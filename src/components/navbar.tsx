@@ -14,6 +14,8 @@ export default function Navbar({state, setState}:{state:boolean, setState:React.
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [activeDropdown, setActiveDropdown] = useState<"userMenu" | null>(null);
 
+   
+
     // ---------- handle click outside ----------
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -77,7 +79,11 @@ export default function Navbar({state, setState}:{state:boolean, setState:React.
                             <div className={`absolute right-0 mt-2.5 w-56 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden transition-all duration-150 z-50 
                             ${ activeDropdown === "userMenu" ? "opacity-100 pointer-events-auto": "opacity-0 pointer-events-none"}`}>
                                 <div className="flex flex-col px-4 py-3 space-y-2">
-                                    <Link href="#" className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md">
+                                    <Link href={`/profile/${session?.user?.username}`} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md"
+                                    onClick={() =>
+                                        setActiveDropdown(activeDropdown === "userMenu" ? null : "userMenu")
+                                    }
+                                    >
                                         <User size={18} /> Profile
                                     </Link>
 

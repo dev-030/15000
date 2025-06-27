@@ -1,70 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { PlayCircle, UploadCloud, Trash2 } from 'lucide-react';
+import { PlayCircle, UploadCloud, Trash2, MonitorUp, CloudUpload } from 'lucide-react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import VideoSectionsUI from './videoUi';
 import useSWR from 'swr';
-
-
-
-// const value  = {
-//     "id": "1",
-//     "title": "Money Management",
-//     "subtitle": "Learn how to save money, create a budget, and invest wisely with industry-expert guidance.",
-//     "course_content": {
-//       "total_sections": 4,
-//       "total_lectures": 32,
-//       "total_length": "1h 26m",
-//       "sections": [
-//         {
-//           "title": "Best Habits",
-//           "lectures": 5,
-//           "length": "8",
-//           "videos": [
-//             { "id": 1, "title": "Welcome to the course", "length": "1m" },
-//             { "id": 2, "title": "What is a habit?", "length": "2m" },
-//             { "id": 3, "title": "How to create a habit?", "length": "2m" },
-//             { "id": 4, "title": "Habits and their benefits", "length": "2m" }
-//           ]
-//         },
-//         {
-//           "title": "Best Practices and Planning",
-//           "lectures": 10,
-//           "length": "20",
-//           "videos": [
-//             { "id": 5, "title": "Welcome to the course", "length": "1m" },
-//             { "id": 6, "title": "What is a habit?", "length": "2m" },
-//             { "id": 7, "title": "How to create a habit?", "length": "2m" },
-//             { "id": 8, "title": "Habits and their benefits", "length": "2m" }
-//           ]
-//         },
-//         {
-//           "title": "Advanced Budget Strategies",
-//           "lectures": 8,
-//           "length": "30",
-//           "videos": [
-//             { "id": 9, "title": "Welcome to the course", "length": "1m" },
-//             { "id": 10, "title": "What is a habit?", "length": "2m" },
-//             { "id": 11, "title": "How to create a habit?", "length": "2m" },
-//             { "id": 12, "title": "Habits and their benefits", "length": "2m" }
-//           ]
-//         },
-//         {
-//           "title": "Investment Fundamentals",
-//           "lectures": 9,
-//           "length": "28",
-//           "videos": [
-//             { "id": 13, "title": "Welcome to the course", "length": "1m" },
-//             { "id": 14, "title": "What is a habit?", "length": "2m" },
-//             { "id": 15, "title": "How to create a habit?", "length": "2m" },
-//             { "id": 16, "title": "Habits and their benefits", "length": "2m" }
-//           ]
-//         }
-//       ]              
-//     } 
-//   }
+import { useForm } from '@tanstack/react-form';
 
 
 
@@ -79,7 +21,25 @@ export default function CourseManagement () {
         fetch(url).then((res) => res.json())
     );
 
-    console.log(data)
+
+    const router = useRouter();
+
+    const [uploading, setUploading] = useState(false);
+    const [message, setMessage] = useState('');
+    const [videoFile, setVideoFile] = useState<{ file: File; url: string } | null>(null);
+    const [toggles, setToggles] = useState({showVideoError: false, showImageError: false});
+    const [open, setOpen] = useState(false);
+    const [percentage, setPercentage] = useState(0);
+    const [activeOption, setActiveOption] = useState<'true'|'false'>('true');
+    const [modalOption, setModalOption] = useState<'1'|'2'|'3'>('1');
+    const [imageFile, setImageFile] = useState<{ file?: File; url: string } | null>(null);
+    
+
+    useEffect(() => {
+    if (data?.thumbnail) {
+        setImageFile({ url: data.thumbnail });
+    }
+    }, [data?.thumbnail]);
 
   
     // const [showInput, setShowInput] = useState(false);
@@ -114,6 +74,64 @@ export default function CourseManagement () {
     if (type === 'thumbnail') setThumbnail(null);
     if (type === 'video') setVideo(null);
   };
+
+
+
+    const form = useForm({
+          defaultValues: {
+            title: data?.course_name,
+            description: data?.course_description,
+            category: data?.category,
+            price: data?.course_price,
+        },
+        //   validators: {
+        //     onSubmitAsync: async ({ value }) => {
+  
+  
+        //       if (!imageFile?.file) {
+        //          return setToggles((prev) => ({ ...prev, showImageError: true }))
+        //       }
+  
+        //       if (!videoFile?.file) {
+        //           return setToggles((prev) => ({ ...prev, showVideoError: true }))
+        //       }
+  
+        //       const convertToBase64 = (file:any) => {
+        //           return new Promise((resolve, reject) => {
+        //             const reader = new FileReader();
+        //             reader.readAsDataURL(file); // reads as base64
+        //             reader.onload = () => resolve(reader.result); // base64 string
+        //             reader.onerror = (error) => reject(error);
+        //           });
+        //       };
+  
+        //       const base64Image = await convertToBase64(imageFile.file);
+  
+        //       const formData = new FormData();
+  
+        //       formData.append("uploaded_thumbnail", base64Image as string);
+        //       formData.append("course_name", value.title);
+        //       formData.append("course_price", value.price);
+        //       formData.append("course_description", value.description);
+        //       formData.append("category", value.category);
+        //       formData.append("is_paid", activeOption);
+  
+        //       setOpen(true);
+        //       setModalOption('1');
+  
+        //       const response = await CreateCourseData(formData)
+  
+        //       if(response.error === 'Mentor profile incomplete.'){
+        //           setModalOption('3');
+        //       }
+  
+        //       if(response.uploadSignature){
+        //           handleUpload(response);
+        //       }
+              
+        //     },
+        //   },
+        })
 
 
     // const handleSectioinCreate = async () => {
@@ -183,87 +201,200 @@ export default function CourseManagement () {
         </TabList>
 
         <TabPanel>
-        
+    
+            <div className="mt-6 flex justify-end gap-4 my-2">
+                <button className="px-4 py-2 bg-blue-400 text-white rounded" onClick={() => form.handleSubmit()} disabled={true}
+                >Save & Continue</button>
+            </div>
+
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
 
                 <div className="space-y-4">
+
                     <div>
-                        <label className="block mb-1 font-medium">Course Category</label>
-                        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-gray-300 p-2 rounded">
-                        <option>Select category</option>
-                        <option value="Design">Design</option>
-                        <option value="Development">Development</option>
-                        </select>
+                        <form.Field 
+                            name="title"
+                            validators={{
+                                onChange: ({ value }) =>
+                                !value
+                                    ? 'A title is required'
+                                    : value.length < 5
+                                    ? 'Title must be at least 5 characters'
+                                    : undefined,
+                            }}
+                            children={(field) => (  
+                                <div>
+                                    <label className="block mb-1 font-medium">Course Title</label>
+                                    <input
+                                        className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
+                                        id={field.name}
+                                        name={field.name}
+                                        value={field.state.value}
+                                        type="text"
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                    />
+                                    {!field.state.meta.isValid && (
+                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
+                                    )}
+                                </div>
+                            )}
+                        />
                     </div>
 
                     <div>
-                        <label className="block mb-1 font-medium">Course Title</label>
-                        <input type="text" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} className="w-full border border-gray-300 p-2 rounded" />
+                        <form.Field 
+                            name="price"
+                            validators={{
+                                onChange: ({ value }) =>
+                                !value
+                                    ? 'A Price is required'
+                                    : undefined,
+                            }}
+                            children={(field) => (  
+                                <div>
+                                    <label className="block mb-1 font-medium">Course Price</label>
+                                    <input
+                                        className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
+                                        id={field.name}
+                                        name={field.name}
+                                        value={field.state.value}
+                                        type="number"
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                    />
+                                    {!field.state.meta.isValid && (
+                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
+                                    )}
+                                </div>
+                            )}
+                        />
                     </div>
 
                     <div>
+                        <form.Field 
+                            name="category"
+                            validators={{
+                                onChange: ({ value }) =>
+                                !value ? 'A category is required' : undefined,
+                            }}
+                            children={(field) => (
+                                <div>
+                                    <label className="block mb-1 font-medium">Course Category</label>
+
+                                    <select 
+                                        id={field.name}
+                                        name={field.name}
+                                        className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                    >
+                                        <option>Select category</option>
+                                        <option value="Design">Design</option>
+                                        <option value="Development">Development</option>
+                                    </select>
+                                    
+                                    {!field.state.meta.isValid && (
+                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
+                                    )}
+                                </div>
+                            )}
+                        />
+                    </div>
+
+                    
+
+                    <div>
+                        
                         <label className="block mb-1 font-medium">Course Tag</label>
-                        <input type="text" placeholder="Add tag" className="w-full border border-gray-300 p-2 rounded" />
+                        <input type="text" placeholder="Add tag" className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500" />
                         <div className="mt-2 flex gap-2 flex-wrap">
-                        {tags.map((tag, idx) => (
-                            <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-sm">{tag}</span>
-                        ))}
+                            {tags.map((tag, idx) => (
+                                <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-sm">{tag}</span>
+                            ))}
                         </div>
+
                     </div>
 
                     <div>
-                        <label className="block mb-1 font-medium">Course Description</label>
-                        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border border-gray-300 p-2 rounded h-24" />
-                        <p className="text-xs text-orange-500 mt-1">Minimum 150 characters and maximum of 250 chars required.</p>
+                        <form.Field 
+                            name="description"
+                            children={(field) => (
+                                <div>
+                                    <label className="block mb-1 font-medium">Course Description</label>
+                                    <textarea
+                                        className="w-full border border-gray-300 p-2 rounded h-40 outline-none focus:border-gray-500"
+                                        id={field.name}
+                                        name={field.name}
+                                        value={field.state.value}
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                    />
+                                    {!field.state.meta.isValid && (
+                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
+                                    )}
+                                </div>
+                            )}
+                        />
                     </div>
                 </div>
-
+            
 
                 <div className="space-y-6">
+                
                     <div className="flex gap-4">
-                        {/* Intro Video */}
+
                         <div className="w-1/2">
-                        <label className="block mb-1 font-medium">Intro Video</label>
-                        <label htmlFor="introVideo" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-gray-400 relative">
-                            {video ? (
-                            <>
-                                <video src={video.url} className="w-full h-full object-cover pointer-events-none" muted preload="metadata" />
-                                <button type="button" onClick={() => handleRemove('video')} className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-                                <Trash2 size={18} className="text-red-500" />
-                                </button>
-                            </>
+                            <h1 className="block mb-1 font-medium">Upload Thumbnail</h1>
+                            {imageFile ? (
+                                <div className="border-2 border-gray-200 w-full aspect-square relative">
+                                    <img src={imageFile.url} alt="Thumbnail" className="object-cover w-full h-full rounded-md"/>
+                                    <button type="button" onClick={()=>setImageFile(null)} className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100">
+                                        <Trash2 size={20} className="text-red-500" />
+                                    </button>
+                                </div>
                             ) : (
-                            <>
-                                <PlayCircle size={32} />
-                                <p className="text-sm">Upload intro video</p>
-                                <p className="text-xs text-red-500">Max file size is 5mb</p>
-                            </>
+                                <label
+                                htmlFor="thumbnail"
+                                className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
+                                >
+                                    <CloudUpload size={32} />
+                                    <p className="text-sm">Upload thumbnai</p>
+                                    <p className="text-xs text-orange-500">*Upload landscape image</p>
+                                </label>
                             )}
-                        </label>
-                        <input id="introVideo" type="file" accept="video/*" onChange={(e) => handleFileChange(e, 'video')} className="hidden" />
+                            
+                            <input id="thumbnail" type="file" accept="image/*" className="hidden" />
+
+                            <p className="text-xs text-orange-500 mt-1">{toggles.showImageError && "Please upload a valid image file"}</p>
                         </div>
 
-                        {/* Upload Thumbnail */}
+                        {data?.is_paid && (
                         <div className="w-1/2">
-                        <label className="block mb-1 font-medium">Upload Thumbnail</label>
-                        <label htmlFor="thumbnail" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-gray-400 relative">
-                            {thumbnail ? (
-                            <>
-                                <img src={thumbnail.url} alt="thumbnail" className="w-full h-full object-cover" />
-                                <button type="button" onClick={() => handleRemove('thumbnail')} className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-                                <Trash2 size={18} className="text-red-500" />
-                                </button>
-                            </>
+                            <h1 className="block mb-1 font-medium">Upload Intro Video</h1>
+                            {videoFile ? (
+                                <div className="border-2 border-gray-200 w-full aspect-square relative">
+                                    <video
+                                        src={videoFile.url}
+                                        controls
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <button type="button" onClick={()=>setVideoFile(null)} className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100">
+                                        <Trash2 size={20} className="text-red-500" />
+                                    </button>
+                                </div>
                             ) : (
-                            <>
-                                <UploadCloud size={32} />
-                                <p className="text-sm">Upload thumbnail</p>
-                                <p className="text-xs text-orange-500">*Upload landscape image</p>
-                            </>
+                                <label
+                                htmlFor="introVideo"
+                                className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
+                                >
+                                    <MonitorUp size={32} />
+                                    <p className="text-sm">Upload intro video</p>
+                                </label>
                             )}
-                        </label>
-                        <input id="thumbnail" type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'thumbnail')} className="hidden" />
+                            
+                            <input id="introVideo" type="file" accept="video/*" className="hidden" />
+                            <p className="text-xs text-orange-500 mt-1">{toggles.showVideoError && "Please upload a valid video file"}</p>
                         </div>
+                        )}
+
                     </div>
 
 
@@ -278,13 +409,12 @@ export default function CourseManagement () {
                         <li>Keep the course up-to-date by regularly reviewing and updating the content to ensure its relevance and accuracy.</li>
                         </ul>
                     </div>
+
                 </div>
+                
+
             </div>
 
-            <div className="mt-6 flex justify-end gap-4">
-                <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Cancel</button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save & Continue</button>
-            </div>
 
         </TabPanel>
 
@@ -293,97 +423,7 @@ export default function CourseManagement () {
 
         <TabPanel>
 
-
-            {/* <div className="space-y-4">
-                {sections.map((section, index) => (
-                    <div key={index} className="border border-slate-300 p-4 rounded">
-
-                        <h2>{section.title}</h2>
-                    
-                        {section.videos.length !== 0 ? (
-                            section.videos.map((videos,index) => (
-                                <div key={index}>
-                                    <h3>{videos.title}</h3>
-                                    hello
-                                </div>
-                            ))
-                        ):(
-                            <div>
-
-                                {showVideoInput && (
-                                    <div className="flex items-center gap-2 border border-slate-400 p-3 my-3">
-
-                                        <input
-                                            type="text"
-                                            value={videoTitle}
-                                            onChange={(e) => setVideoTitle(e.target.value)}
-                                            placeholder="Enter video name"
-                                            className="border border-gray-300 px-4 py-1 w-full"
-                                        />
-
-                                        <div className='flex items-center gap-2'>
-                                            <input
-                                                type="file"
-                                                accept="video/*"
-                                                onChange={(e) => setVideoFile(e.target.files[0])}
-                                            />
-
-                                            <button
-                                                onClick={()=>handleUploadVideo(section.id)}
-                                                className="bg-blue-500 text-white px-4 py-1 rounded"
-                                            >
-                                                Upload
-                                            </button>
-
-                                        </div>
-
-                                       
-                                        
-                                    </div>
-                                )}
-
-                                <button onClick={() => setVideoInput(true)} className="bg-blue-500 text-white px-4 py-1 rounded">Upload video</button>
-                            </div>
-                        )}
-                        
-                    </div>
-                    // <div key={section.id} className="border border-slate-300 p-4 rounded">
-                    //     <h2 className="text-lg font-semibold">{section.name}</h2>
-                    //     <button className="mt-2 bg-green-600 text-white px-3 py-1 rounded">
-                    //         Upload Video
-                    //     </button>
-                    // </div>
-                ))}
-
-                {showInput && (
-                    <div className="flex items-center gap-2 bg-white border border-slate-300 py-3 px-2 w-64 rounded shadow mt-4">
-                        <input
-                            type="text"
-                            value={sectionName}
-                            onChange={(e) => setSectionName(e.target.value)}
-                            placeholder="Enter section name"
-                            className="border border-gray-300 px-2 py-1 w-full"
-                        />
-                        <button onClick={handleSectioinCreate} className="bg-blue-500 text-white px-4 py-1 rounded">
-                            Create
-                        </button>
-                    </div>
-                )}
-
-                <div
-                    className="border border-slate-300 py-3 px-5 w-fit cursor-pointer"
-                    onClick={() => setShowInput(true)}
-                >
-                    <h1>+ Add section</h1>
-                </div>
-                </div> */}
-
-
-
-            <VideoSectionsUI courseId={params.slug as string} data={data?.sections}/>
-
-
-                
+            <VideoSectionsUI courseId={params.slug as string} data={data}/>     
 
         </TabPanel>
 

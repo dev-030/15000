@@ -28,8 +28,6 @@ export default function BookedSessions(){
         }
     );
 
-    console.log(data, isLoading)
-
     
 
     return (

@@ -12,8 +12,14 @@ export default function AppLayout({children}:{children:React.ReactNode}){
     const [isOpen, setIsOpen] = useState(false);
     const [windowWidth, setWindowWidth] = useState(0);
 
-    const showSidebar = pathname === '/' || pathname === '/courses' || pathname === '/mentors' || pathname === '/my-courses' || pathname === '/sessions' || pathname === '/saved' || windowWidth <=700 && pathname === '/onboarding';
-
+    const showSidebar =
+    windowWidth <= 700 ||
+    pathname === '/' ||
+    pathname === '/courses' ||
+    pathname === '/mentors' ||
+    pathname === '/my-courses' ||
+    pathname === '/sessions' ||
+    pathname === '/saved';
 
     useEffect(() => {
         function handleResize() {
@@ -23,7 +29,6 @@ export default function AppLayout({children}:{children:React.ReactNode}){
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
 
     return(
 
