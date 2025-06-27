@@ -31,8 +31,8 @@ export default async function RootLayout({ children}: Readonly<{children: React.
             {children}
           </LockScreen>
         </SessionProvider>
-        {/* <Analytics /> */}
-        {/* <SpeedInsights /> */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
