@@ -1,13 +1,20 @@
 'use client'
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, BookmarkCheck } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BecomeMentor } from '@/lib/actions/actions';
+import { set } from 'zod';
+import { useClientSession } from '@/context/sessionProvider';
 
 
 
 export default function MentorRegistrationForm() {
+
+
+  const role = useClientSession()?.user?.role;
+
+  if(role === 'mentor') return redirect('/');
 
 
   const [formData, setFormData] = useState({
@@ -16,6 +23,8 @@ export default function MentorRegistrationForm() {
     phoneNumber: '',
     facebookProfile: ''
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const router = useRouter();
@@ -29,7 +38,10 @@ export default function MentorRegistrationForm() {
     setFormData(prev => ({ ...prev, gender }));
   };
 
+
   const handleSubmit = async(e:any) => {
+
+    setIsLoading(true);
     
     e.preventDefault();
 
@@ -40,13 +52,22 @@ export default function MentorRegistrationForm() {
       "facebook_account": formData.facebookProfile
     }
 
-    await BecomeMentor(data)
-    
-    const response = await BecomeMentor(data);
+    try {
 
-    if(response === 200){
-      router.push('/mentor/dashboard');
+      await BecomeMentor(data)
+      
+      const response = await BecomeMentor(data);
+
+      if(response === 200){
+        router.push('/mentor/dashboard');
+      }
+
+    } catch (error) {
+      console.error(error);
+    }finally{
+      setIsLoading(false);
     }
+
 
   };
   
@@ -182,9 +203,15 @@ export default function MentorRegistrationForm() {
                   <ArrowLeft className="w-4 h-4 mr-1" />
                   <Link href={"/"}>Back</Link>
                 </button>
-                <button type="submit" className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer">
-                  <span>Continue</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                <button type="submit" disabled={isLoading} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer">
+                  {isLoading ? (<div className="flex items-center gap-2">
+                    <span>Processing</span>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-l-transparent rounded-full animate-spin" />
+                  </div>): (<>
+                    <span>Continue</span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </>
+                  )}
                 </button>
               </div>
             </form>

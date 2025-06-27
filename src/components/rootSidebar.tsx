@@ -73,8 +73,6 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
 
                     </div>
                 )}
-                
-                 
 
             </aside>
         </>

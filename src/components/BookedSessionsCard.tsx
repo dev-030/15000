@@ -146,79 +146,47 @@ import { useRouter } from 'next/navigation';
 //       {hh}:{mm}:{ss} until session
 //     </div>
 //   );
-// };
+// }; 
 
 // Session card component
 export default function BookedSessionsCard ({data}:{data:any}) {
-    
-
-
-
-
-
 
 
   const router = useRouter();
 
+  console.log(data.results)
 
+  const timeRemaining = (targetTime: string) => {
+    const now = new Date(); // Local time
+    const endTime = new Date(targetTime); // Parsed from input (ISO 8601 with timezone)
 
+    const total = endTime.getTime() - now.getTime(); // milliseconds difference
 
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(total / (1000 * 60 * 60 * 24));
 
-
-  // fix booked sessions card implement all the features in it. also from the mentor implement the rescheduling 
-  // feature and also make it work from the client also. also make the data update automatically when mentor accepts
-  // send an notification to the user when mentor accepts it
-  // make the mentor dashboard functions fully functional also the details page needs more data so add options to add them from the mentors dashboard. 
-  // add input field when booking a new session
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    console.log(data.results)
-
-    const timeRemaining = (targetTime: string) => {
-      const now = new Date(); // Local time
-      const endTime = new Date(targetTime); // Parsed from input (ISO 8601 with timezone)
-
-      const total = endTime.getTime() - now.getTime(); // milliseconds difference
-
-      const seconds = Math.floor((total / 1000) % 60);
-      const minutes = Math.floor((total / 1000 / 60) % 60);
-      const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-      const days = Math.floor(total / (1000 * 60 * 60 * 24));
-
-      return {
-        total,
-        days,
-        hours,
-        minutes,
-        seconds,
-      };
-
+    return {
+      total,
+      days,
+      hours,
+      minutes,
+      seconds,
     };
 
-    const formatDate = (dateStr: string, timeZone?: string): string =>
-      new Date(dateStr).toLocaleString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-      ...(timeZone ? { timeZone } : {}),
-    });
+  };
+
+  const formatDate = (dateStr: string, timeZone?: string): string =>
+    new Date(dateStr).toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    ...(timeZone ? { timeZone } : {}),
+  });
 
 
   return (
@@ -237,7 +205,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
-                <div className='h-20 w-20 relative'>
+                <div className='h-16 w-16 relative'>
                     <Image
                         src={data?.mentor_pic}
                         alt={'image'}
@@ -270,20 +238,17 @@ export default function BookedSessionsCard ({data}:{data:any}) {
               <span>৳</span>
               <span>{data?.duration_min} taka</span>
             </div>             
-
           </div>
 
           <div className="mt-4 border px-10 border-slate-300 rounded-md py-4 flex justify-between items-center">
             {data.status === 'A' ? (
               <>
-
                 <h1>Accepted session</h1>
 
                 <button onClick={()=>router.push(data?.meet_link)} className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center cursor-pointer'>
                   <ArrowRight size={16} className="ml-2" />
                   Join Session
                 </button>
-                
               </>
             ) : data.status === 'R' ? (
               <div className="text-yellow-600 italic w-full text-center">Waiting for mentor approval</div>
@@ -336,49 +301,3 @@ export default function BookedSessionsCard ({data}:{data:any}) {
 
 
 
-// // Filter tabs component
-// const FilterTabs: FC<FilterTabsProps> = ({ activeFilter, setActiveFilter }) => {
-//   const filters = [
-//     { key: 'all', label: 'All Sessions' },
-//     { key: 'upcoming', label: 'Upcoming' },
-//     { key: 'pending', label: 'Pending' },
-//     { key: 'completed', label: 'Completed' },
-//     { key: 'cancelled', label: 'Cancelled' },
-//   ];
-
-//   return (
-//     <div className="flex mb-6 border-b">
-//       {filters.map((filter) => (
-//         <button
-//           key={filter.key}
-//           className={`py-2 px-4 mr-2 ${
-//             activeFilter === filter.key
-//               ? 'border-blue-500 text-blue-500 border-b-2 font-medium'
-//               : 'text-gray-500 hover:text-gray-700'
-//           }`}
-//           onClick={() => setActiveFilter(filter.key)}
-//         >
-//           {filter.label}
-//         </button>
-//       ))}
-//     </div>
-//   );
-// };
-
-
-
-{/* <div className="">
-        <FilterTabs activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
-        {filteredSessions.length > 0 ? (
-          filteredSessions.map((s) => <SessionCard key={s.id} session={s} />)
-        ) : (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No sessions found</h3>
-            <p className="text-gray-500">
-              {activeFilter === 'all'
-                ? "You haven't booked any sessions yet."
-                : `You don't have any ${activeFilter} sessions.`}
-            </p>
-          </div>
-        )}
-      </div> */}

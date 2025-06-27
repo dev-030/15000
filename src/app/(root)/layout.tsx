@@ -34,13 +34,13 @@ export default function AppLayout({children}:{children:React.ReactNode}){
 
         <div>
 
-            <div className="border-b-[1px] border-b-gray-300 px-4 fixed top-0 left-0 right-0 bg-white z-10 py-1.5">
+            <div className="px-4 fixed top-0 left-0 right-0 bg-white z-10 py-1.5">
                 <Navbar state={isOpen} setState={setIsOpen}/>
             </div>
 
             <div className="flex mt-[3.3rem]">
 
-                <div className={`fixed overflow-y-auto min-h-full border-r-[1px] border-r-gray-300 bg-white z-50 transition-transform duration-300 ease-in-out
+                <div className={`fixed overflow-y-auto min-h-full bg-white z-50 transition-transform duration-300 ease-in-out
                     ${showSidebar ? `${windowWidth <=700 ? `${isOpen ? 'translate-x-0':'-translate-x-full'}`:''}`:'hidden'}`}>
                     <RootSideBar state={isOpen} setState={setIsOpen}/>
                 </div>

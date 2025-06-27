@@ -6,6 +6,8 @@ interface SessionData {
     username: string;
     user_id: string;
     profile_pic: string;
+    role: string;
+    full_name: string;
   } | null;
 }
 
