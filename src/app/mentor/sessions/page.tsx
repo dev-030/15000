@@ -1,6 +1,7 @@
 'use client'
 import { RescheduleSession, SessionRequestsAccept } from "@/lib/actions/actions";
-import { X, CalendarCog, Check } from "lucide-react";
+import { X, CalendarCog, Check, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 
@@ -14,7 +15,7 @@ export default function SessionRequests() {
   const [open, setOpen] = useState(false);
   const [dateTime, setDateTime] = useState(null);
 
-
+  const router = useRouter();
 
   const onAccept = async (sessionId:any) => {
     await SessionRequestsAccept(sessionId);
@@ -29,11 +30,7 @@ export default function SessionRequests() {
     }
   };
 
-  console.log(data)
-
   if (isLoading) return <div className="text-center py-20">Loading...</div>;
-
-
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -137,8 +134,14 @@ export default function SessionRequests() {
               </div>
               <div className="border border-slate-300 rounded-md py-4 flex justify-center items-center">
                 {session.status === "A" ? (
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center w-full px-3">
                     <h1 className="text-green-600 font-bold">Accepted session</h1>
+                    <div className="justify-end ml-auto">
+                      <button onClick={() => window.open(session?.meet_link, '_blank')} disabled={session?.meet_link=== null} className={`bg-blue-500  text-white px-4 py-2 rounded-md flex items-center gap-1 ${session?.meet_link === null ? "":"cursor-pointer hover:bg-blue-600"} `}>
+                        <ArrowRight size={16} className="ml-2" />
+                        Join Session
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex gap-4">

@@ -19,12 +19,9 @@ export default function BookedSessions(){
     if(!user) redirect('/login');
 
 
-    const { data, isLoading } = useSWR("/api/booked-sessions", (url: string) =>
+    const { data, isLoading } = useSWR("/api/booked-sessions", (url: string) => 
         fetch(url).then((res) => res.json()), {
-            // suspense: true,
-            // fallbackData: {},
-            // revalidateOnFocus: true,
-            // keepPreviousData: true,
+            refreshInterval: 60 * 100,
         }
     );
 

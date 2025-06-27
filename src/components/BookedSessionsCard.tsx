@@ -245,7 +245,7 @@ export default function BookedSessionsCard ({data}:{data:any}) {
               <>
                 <h1>Accepted session</h1>
 
-                <button onClick={()=>router.push(data?.meet_link)} className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center cursor-pointer'>
+                <button onClick={() => window.open(data?.meet_link, '_blank')} disabled={data?.meet_link === null} className={`bg-blue-500  text-white px-4 py-2 rounded-md flex items-center justify-center gap-1 ${data?.meet_link === null ? "":"cursor-pointer hover:bg-blue-600"} `}>
                   <ArrowRight size={16} className="ml-2" />
                   Join Session
                 </button>
