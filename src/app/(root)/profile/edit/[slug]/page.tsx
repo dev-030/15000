@@ -77,7 +77,20 @@ export default function EditProfile() {
     //   profileImageFile: formData.profileImageFile?.name,
     // });
 
+<<<<<<< Updated upstream
     const res = await UpdateProfile(formData)
+=======
+    try {
+      await UpdateProfile(formData)
+      toast.success('Profile updated successfully.');   
+    }catch(error){
+      console.error(error);
+      toast.error('Something went wrong.');   
+    }finally{
+      setLoading(false);
+      mutate();
+    }
+>>>>>>> Stashed changes
 
     console.log(res);
   };
