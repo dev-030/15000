@@ -19,10 +19,22 @@ export default function ProfilePage() {
 
     const isOwnProfile = session?.user?.username === params.slug;
 
-    const {data} = useSWR(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/user-profile/${params.slug}/`, (url: string) =>
+    const {data, isLoading} = useSWR(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/user-profile/${params.slug}/`, (url: string) =>
         fetch(url).then((res) => res.json())
     );
     
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <h2 className="text-lg text-gray-600 font-semibold">Loading your profile...</h2>
+                </div>
+            </div>
+        );
+    }
+
+    console.log(data);
 
     // get the user live data from online api......................................................
 
@@ -137,7 +149,7 @@ export default function ProfilePage() {
 
                     <div className='flex justify-between w-full'>
                         <div>
-                            <h1 className='text-gray-600 text-2xl font-semibold'>Kazuma</h1>
+                            <h1 className='text-gray-600 text-2xl font-semibold'>{data.full_name}</h1>
                             <p className='text-gray-700 text-sm mt-1'>Adventurer from axel</p>
 
                             <div className='flex items-center gap-2 text-gray-600 mt-2'>
@@ -178,7 +190,7 @@ export default function ProfilePage() {
                         <div className='mt-2'>
                             <h1 className='text-gray-600 font-medium py-2'>About Me</h1>
 
-                            <p className='text-gray-500 text-sm'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, id blanditiis earum provident accusantium tenetur velit nisi laboriosam eaque? Ipsa officia necessitatibus, magni quia aperiam officiis. Doloremque iure dicta nulla quos aspernatur culpa rem possimus error vero numquam nemo dolorum, asperiores magni minus at quisquam debitis? Autem sed voluptatem fuga? Voluptate voluptatum perferendis minus eum voluptas natus possimus inventore ut ab corporis dignissimos enim magnam nemo suscipit dolor recusandae, dolores voluptatibus, aliquam necessitatibus. Nobis veniam repellendus sapiente totam dicta molestias, odio quae temporibus natus omnis, tenetur, odit nostrum quam iusto accusantium velit beatae ratione dolor quasi illo in provident nesciunt?</p>
+                            <p className='text-gray-500 text-sm'>{data.mentor_profile?.about}</p>
 
 
 

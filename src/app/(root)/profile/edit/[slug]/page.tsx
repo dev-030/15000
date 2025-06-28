@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useClientSession } from '@/context/sessionProvider';
 import { UpdateProfile } from '@/lib/actions/actions';
 import useSWR from 'swr';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 
@@ -16,7 +17,7 @@ export default function EditProfile() {
   const session = useClientSession();
   const param = useParams();
   const isOwnProfile = param.slug === session?.user?.username;
-
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -27,13 +28,40 @@ export default function EditProfile() {
   });
 
 
-  const {data, isLoading} = useSWR(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/user-profile/${param.slug}/`, 
+  if(!isOwnProfile) router.push('/');
+
+
+  const {data, isLoading, mutate} = useSWR(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/user-profile/${param.slug}/`, 
     (url: string) =>
     fetch(url).then((res) => res.json())
   );
 
 
-  if(!isOwnProfile) router.push('/');
+  useEffect(() => {
+    if (data && !isLoading) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: data.full_name || '',
+        bio: data.mentor_profile?.about || '',
+        facebook: data.facebook || '',
+      }));
+    }
+  }, [data, isLoading]);
+
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <h2 className="text-lg text-gray-600 font-semibold">Loading your profile...</h2>
+        </div>
+      </div>
+    );
+  }
+
+
+
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -72,18 +100,30 @@ export default function EditProfile() {
   };
 
   const handleSubmit = async() => {
+    setLoading(true);
     // console.log('Submitting:', {
     //   ...formData,
     //   profileImageFile: formData.profileImageFile?.name,
     // });
 
-    const res = await UpdateProfile(formData)
+    try {
+      const res = await UpdateProfile(formData)
+      console.log(res);
+      toast.success('Profile updated successfully.');   
+    }catch(error){
+      console.error(error);
+      toast.error('Something went wrong.');   
+    }finally{
+      setLoading(false);
+      mutate();
+    }
 
-    console.log(res);
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-xl">
+
+      <Toaster/>
 
       <ArrowLeft className='text-gray-500 text-xl bg-slate-100 rounded-md p-1 cursor-pointer mb-6' onClick={()=>router.back()}/>
 
@@ -126,11 +166,11 @@ export default function EditProfile() {
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">Short Bio</label>
         <textarea
-          value={data?.mentor_profile.about}
+          value={formData.bio}
           onChange={(e) => handleChange('bio', e.target.value)}
           className="w-full mt-1 text-base border border-gray-300 rounded-lg px-4 py-2 outline-none focus:border-gray-500"
           rows={4}
-        /> 
+        />
       </div>
 
       {/* Facebook */}
@@ -189,9 +229,14 @@ export default function EditProfile() {
       <div className="flex justify-end">
         <button
           onClick={handleSubmit}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg shadow-sm transition duration-150 transform hover:scale-105 cursor-pointer"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm transition duration-150 transform cursor-pointer"
         >
-          Save Changes
+          {loading ? (
+            <div className='flex items-center gap-2'>
+              <h1>Updating</h1>
+              <div className="w-3.5 h-3.5 border-2 border-white border-l-transparent rounded-full animate-spin" />
+            </div>
+          ):("Save Changes")}
         </button>
       </div>
     </div>
