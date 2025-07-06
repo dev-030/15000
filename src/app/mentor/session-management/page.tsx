@@ -8,6 +8,7 @@ import { Calendar, Plus } from 'lucide-react';
 import CreateSessionModal from '@/components/SessionModal';
 import { SessionManagementData } from '@/lib/actions/actions';
 import useSWR from 'swr';
+import { Toaster } from 'react-hot-toast';
 
 
 interface Session {
@@ -34,10 +35,11 @@ export default function SessionManagement() {
 
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 min-h-screen">
 
       <div className=" rounded-lg min-h-screen">
 
+        <Toaster/>
         <CreateSessionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
         {isLoading ? (

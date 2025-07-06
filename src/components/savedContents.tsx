@@ -12,13 +12,15 @@ export default async function SavedContents() {
     
     if(!user) redirect('/login');
 
-    const data = await apiService.get('#',{
-        requiresAuth: true,
-        cache: 'no-cache'
-    })
-    .catch(error => {
-        console.error({"ERROR":error.message});
-    })
+    const data = false;
+
+    // const data = await apiService.get('#',{
+    //     requiresAuth: true,
+    //     cache: 'no-cache'
+    // })
+    // .catch(error => {
+    //     console.error({"ERROR":error.message});
+    // })
 
     return (
         <div>

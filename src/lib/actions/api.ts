@@ -34,7 +34,7 @@ class RestApi {
     }
 
 
-    private async request<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
+    private async request<T>(endpoint: string, options: ApiOptions = {}): Promise<T|{status:number}> {
 
         const { params, requiresAuth = false, ...fetchOptions } = options;
         
@@ -63,14 +63,9 @@ class RestApi {
             throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         }
 
-        // if (!response.ok) {
-
-        //     const val = await response.json();
-
-        //     if(!!val) return response.json();
-
-        //     throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-        // }
+        if (response.status === 204) {
+            return {status: response.status};
+        }
 
         return response.json();
     }
@@ -80,7 +75,7 @@ class RestApi {
         return this.request<T>(endpoint, { ...options, method: 'GET' });
     }
 
-    async post<T>(endpoint: string, options?: Omit<ApiOptions, 'method'>): Promise<T> {
+    async post<T>(endpoint: string, options?: Omit<ApiOptions, 'method'>): Promise<T|{status:number}> {
         return this.request<T>(endpoint, { ...options, method: 'POST' });
     }
 
@@ -92,7 +87,7 @@ class RestApi {
         });
     }
 
-    async patch<T>(endpoint: string, data?: any, options?: Omit<ApiOptions, 'method'>) {
+    async patch<T>(endpoint: string, data?: any, options?: Omit<ApiOptions, 'method'>): Promise<T|{status:number}> {
         return this.request<T>(endpoint, {
             ...options,
             method: 'PATCH',
@@ -100,7 +95,7 @@ class RestApi {
         });
     }
 
-    async delete<T>(endpoint: string, options?: Omit<ApiOptions, 'method' | 'body'>) {
+    async delete<T>(endpoint: string, options?: Omit<ApiOptions, 'method' | 'body'>): Promise<T|{status:number}> {
         return this.request<T>(endpoint, { ...options, method: 'DELETE' });
     }
 

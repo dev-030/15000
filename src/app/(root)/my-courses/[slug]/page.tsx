@@ -1,46 +1,79 @@
-// 'use client' 
+'use client' 
 // import { useEffect, useRef } from 'react';
 // import Plyr from 'plyr';
 // import 'plyr/dist/plyr.css';
 // import shaka from 'shaka-player';
 
+import { lazy, Suspense, useEffect } from "react";
 import VideoList from "@/components/VideoList";
-import VideoPlayer from "@/components/videoPlayer";
-import { apiService } from "@/lib/actions/api";
-import { redirect } from "next/navigation";
+const VideoPlayer = lazy(() => import("@/components/videoPlayer"));
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import useSWR, { preload } from "swr";
+ 
+
+
+
+export default function CoursePage() {
+
+    const router = useRouter();
+    const { slug } = useParams();
+    const videoId = useSearchParams().get('video');
+
+    const { data, isLoading } = useSWR(`/api/courses/${slug}`, async(url) =>
+        await fetch(url).then((res) => res.json())
+    );
+
+
+    useEffect(() => {
+        if (!isLoading && data && !videoId) {
+            const firstVideo = data.sections?.[0]?.videos?.[0];
+            if (firstVideo) {
+                preload(`/api/video/${firstVideo.id}`, async(url) => 
+                    await fetch(url).then(res => res.json())
+                );
+                router.replace(`/my-courses/${slug}?video=${firstVideo.id}`);
+            }
+        }
+    }, [isLoading, data, videoId, slug, router]);
+    
+
+    
+    if (isLoading || (!videoId && data?.sections?.[0]?.videos?.length > 0)) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            </div>
+        );
+    }
 
 
 
 
-export default async function CoursePage({ params, searchParams }: {params: { courseId: string }, searchParams: { video?: string }}) {
-
-    const { slug } = await params;
-    const {video} = await searchParams;
-
-
-    const response = await apiService.get(`/course/course-info-all-users/${slug}/`, {
-      cache: 'no-cache',
-    });
-
-
-    if (!video && response?.sections[0].videos.length > 0) {
-        redirect(`/my-courses/${slug}?video=${response.sections[0].videos[0].id}`);
+    if (!!data.error) {
+        return (
+            <div className="min-h-screen text-4xl text-center p-10">Failed to load course.</div>
+        );
     }
 
     
     return(
+        <div className="min-h-screen p-0 grid grid-cols-1 relative lg:grid-cols-3 gap-6">
 
-        <div className="min-h-screen p-6 md:p-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <VideoPlayer videoId={video as string} />
+          <div className="lg:col-span-2 flex flex-col items-center sticky top-20">
+            <div className="w-full aspect-video max-w-5xl">
+              <Suspense fallback={<div className='w-full aspect-video bg-gray-200 rounded-lg animate-pulse' />}> 
+                <VideoPlayer />
+              </Suspense>
             </div>
+          </div>
 
-            <aside className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200 lg:col-span-1 max-h-[90vh] overflow-y-auto">
-                <h2 className="text-xl font-semibold text-gray-700 mb-4">Course Content</h2>
-                <VideoList currentVideoId={video as string} data={response} />
-            </aside>
+
+          <aside className="lg:col-span-1 max-w-sm w-full mx-auto">
+            <VideoList currentVideoId={videoId as string} data={data} />
+          </aside>
         </div>
-        
     )
 }
 

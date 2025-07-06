@@ -21,17 +21,18 @@ export default function BookedSessions(){
 
     const { data, isLoading } = useSWR("/api/booked-sessions", (url: string) => 
         fetch(url).then((res) => res.json()), {
-            refreshInterval: 60 * 100,
+            refreshInterval: 60 * 1000,
         }
     );
-
     
 
     return (
         <div>
             {isLoading ? (
-                <div className="min-h-screen grid place-content-center">
-                    <p>Loading sessions...</p>
+                <div className="min-h-screen flex items-center justify-center bg-white">
+                    <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
                 </div>
             ) : data?.results && data.results.length > 0 ? (
                 <BookedSessionsCard data={data} />

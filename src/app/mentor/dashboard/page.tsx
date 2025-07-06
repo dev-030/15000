@@ -227,7 +227,7 @@ export default function Dashboard() {
   };
   
   return (
-    <div className="p-6 bg-gray-50">
+    <div className="p-6">
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Mentor Dashboard</h1>

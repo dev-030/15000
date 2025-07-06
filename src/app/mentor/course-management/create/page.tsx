@@ -2,77 +2,40 @@
 
 import axios from "axios";
 import Link from "next/link";
-import { act, useEffect, useState } from "react";
+import { act, useEffect, useRef, useState } from "react";
 import * as tus from 'tus-js-client'; 
 import crypto from 'crypto-js';
 import { ArrowLeft, ArrowRight, CalendarDays, CircleAlert, CircleChevronLeft, CloudUpload, MonitorUp, Trash2, UploadCloud, UserRoundPen } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { CreateCourseData } from "@/lib/actions/actions";
 import ReactDOM from 'react-dom/client'
-import { useForm } from '@tanstack/react-form'
 import { useClientSession } from "@/context/sessionProvider";
+import { string, z } from "zod";
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import imageCompression from "browser-image-compression";
+import CreateCoursePopUp from "@/components/createCoursePopUp";
+
+
 
 
 
 export default function CreateCourse(){
 
-    const [uploading, setUploading] = useState(false);
-    const [message, setMessage] = useState('');
     const [imageFile, setImageFile] = useState<{ file: File; url: string } | null>(null);
     const [videoFile, setVideoFile] = useState<{ file: File; url: string } | null>(null);
     const router = useRouter();
-    const [toggles, setToggles] = useState({showVideoError: false, showImageError: false});
-    const [tags, setTags] = useState(['UI Design', 'UI Design Fundamental']);
+
     const [open, setOpen] = useState(false);
     const [percentage, setPercentage] = useState(0);
-    const [activeOption, setActiveOption] = useState<'true'|'false'>('true');
+    const [isPaid, setIsPaid] = useState<boolean>(true);
     const [modalOption, setModalOption] = useState<'1'|'2'|'3'>('1');
     const session = useClientSession();
+    const imageInputRef = useRef<HTMLInputElement>(null);
+    const videoInputRef = useRef<HTMLInputElement>(null);
 
 
 
-    const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const file = e.target.files[0];
-        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-
-        if (!allowedExtensions.includes(fileExtension) || !allowedMimeTypes.includes(file.type)) {
-            alert('Only image files are allowed.');
-            e.target.value = '';
-            return;
-        }
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setImageFile({ file, url: imageUrl });
-            setToggles((prev) => ({ ...prev, showImageError: !prev.showImageError}))
-        }
-        e.target.value = '';
-    };
-
-
-    const handleIntroVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const file = e.target.files?.[0];
-        const allowedExtensions = ['.mp4', '.mov', '.avi'];
-        const allowedMimeTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo'];
-    
-        if (!allowedExtensions.includes(file.name.slice(file.name.lastIndexOf('.'))) || !allowedMimeTypes.includes(file.type)) {
-            alert('Only video files are allowed.');
-            e.target.value = '';
-            return;
-        }
-        if(file){
-            const mediaUrl = URL.createObjectURL(file);
-            setVideoFile({ file, url: mediaUrl });
-            setToggles((prev) => ({ ...prev, showVideoError: !prev.showVideoError}))
-        }
-
-
-        e.target.value = '';
-
-    };
 
 
 
@@ -80,9 +43,6 @@ export default function CreateCourse(){
     const handleUpload = async (val:any) => {
 
         if (!videoFile) return;
-
-        setUploading(true);
-        setMessage('');
         setModalOption('2');
 
         try {            
@@ -109,167 +69,113 @@ export default function CreateCourse(){
                     setPercentage(percentage);
                 },
                 onSuccess: () => {
-                    router.push(`/mentor/course-management/${val.course_id}`);
+                    router.push(`/mentor/course-management/${val.id}`);
                 },
             })
 
-            upload.findPreviousUploads().then((previousUploads) => {
-                if (previousUploads.length) {
-                  upload.resumeFromPreviousUpload(previousUploads[0]);
-                }
-                upload.start();
-            });
+            upload.start();
 
         } catch (err) {
             console.error(err);
-            setMessage('Something went wrong during upload.');
-        } finally {
-            setUploading(false);
         }
     };
 
 
-    // useEffect(() => {
-    // const handler = (e: KeyboardEvent) => {
-    //     if (e.key === 'Escape') setOpen(false);
-    // };
-    // if (open) window.addEventListener('keydown', handler);
-    // return () => window.removeEventListener('keydown', handler);
-    // }, [open]);
 
 
-    const form = useForm({
+    const schema = z.object({
+        title: z.string().min(5),
+        price: isPaid === false ? z.coerce.number().optional() : z.coerce.number().min(1, 'Price must be at least 1'),
+        category: z.string().min(1, "At least one category is required"),
+        tags: z.array(z.string().min(1, "Tag cannot be empty")).min(1, "At least one tag is required"),
+        description: z.string().min(10),
+        thumbnail: z
+        .custom<FileList>((file)=> file instanceof FileList && file.length > 0,{
+            message: "Please upload an image"
+        })
+        .refine((files)=> {
+            return files?.[0] && ['image/jpeg', 'image/png', 'image/jpg'].includes(files?.[0].type);
+        },{ message: "Only JPG, PNG, JPEG images are allowed" }),
+        introVideo: isPaid === true ? z
+        .custom<FileList>((file)=> file instanceof FileList && file.length > 0,{
+            message: "Please upload an video"
+        })
+        .refine((files)=> {
+            return files?.[0] && ['video/mp4', 'video/quicktime', 'video/x-msvideo'].includes(files?.[0].type);
+        },{ message: "Only MP4, Quicktime, X-msvideo videos are allowed" }) : z.optional(z.any()),
+    });
+
+
+
+    const {register, unregister, handleSubmit, control, formState: {errors}} = useForm<z.infer<typeof schema>>({
+        resolver: zodResolver(schema),
         defaultValues: {
-          title: '',
-          description: '',
-          category: '',
-          price: '',
+            tags: [],
         },
-        validators: {
-          onSubmitAsync: async ({ value }) => {
+    });
+    
 
-            if (!imageFile?.file) {
-               return setToggles((prev) => ({ ...prev, showImageError: true }))
-            }
 
-            
-            if (activeOption === 'true' && !videoFile?.file) {
-                return setToggles((prev) => ({ ...prev, showVideoError: true }))
-            }
-            
+    const onSubmit = async(values: z.infer<typeof schema>) => {
 
-            const convertToBase64 = (file:any) => {
-                return new Promise((resolve, reject) => {
-                  const reader = new FileReader();
-                  reader.readAsDataURL(file); // reads as base64
-                  reader.onload = () => resolve(reader.result); // base64 string
-                  reader.onerror = (error) => reject(error);
-                });
-            };
+        setOpen(true);
+        setModalOption('1');
 
-            const base64Image = await convertToBase64(imageFile.file);
+        const compressedImage = async(file:File) => {
+            return await imageCompression.getDataUrlFromFile(
+                await imageCompression(file, {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1024,
+                useWebWorker: true,
+                initialQuality: 0.7,
+            }));          
+        }
 
-            const formData = new FormData();
+        const data = {
+            course_name: values.title,
+            is_paid: isPaid,
+            course_description: values.description,
+            category: values.category,
+            uploaded_thumbnail: await compressedImage(values.thumbnail[0]),
+            ...(isPaid && { course_price: values.price })
+            // tags: values.tags,
+        }
 
-            formData.append("uploaded_thumbnail", base64Image as string);
-            formData.append("course_name", value.title);
-            {activeOption === 'true' && formData.append("course_price", value.price);}
-            formData.append("course_description", value.description);
-            formData.append("category", value.category);
-            formData.append("is_paid", activeOption);
+        const response = await CreateCourseData(data);
 
-            setOpen(true);
-            setModalOption('1');
 
-            const response = await CreateCourseData(formData)
+        if(response.error === 'Mentor profile incomplete.'){
+            setModalOption('3');
+        }
 
-            if(response.error === 'Mentor profile incomplete.'){
-                setModalOption('3');
-            }
+        if(response.id){
+            {isPaid === true ? handleUpload(response) : router.push(`/mentor/course-management/${response.id}`)}
+        }
 
-            if(response.course_id){
-                {activeOption === 'true' ? handleUpload(response) :  router.push(`/mentor/course-management/${response.course_id}`)}
-            }
-            
-          },
-        },
-      })
+    }
 
-  
+
+
+    useEffect(() => {
+        if (isPaid === false) {
+            unregister(['price','introVideo']);
+        }
+    }, [isPaid, unregister]);
+
+
     return(
 
         <div className="p-6 max-w-7xl mx-auto bg-white">
 
             {open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
-
-                    <div className="bg-white p-6 sm:p-8 rounded-xl w-fit relative">                        
-                        
-                        {modalOption === '1' && (
-                            <div className="flex items-center gap-3">
-                                <h1 className="text-base font-semibold text-gray-800">Creating course</h1>
-                                <div className="w-3.5 h-3.5 border-2 border-gray-800 border-t-transparent rounded-full animate-spin" />
-                            </div>
-                        )}
-
-                        {modalOption === '2' && (
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-medium text-slate-700">Uploading Video</h3>
-                                    <span className="text-sm font-medium text-slate-600">{percentage}%</span>
-                                </div>
-
-                                <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                                    <div
-                                        className="bg-blue-600 h-full rounded-full transition-all duration-300 ease-out"
-                                        style={{ width: `${percentage}%` }}
-                                    />
-                                </div>
-
-                                <div className="mt-6 flex items-center text-xs text-yellow-500 gap-2">
-                                    <CircleAlert size={15} />
-                                    <span>Please don’t close the window while uploading</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {modalOption === '3' && (
-                            <div className="grid place-content-center">
-                                <div className="flex flex-col items-center justify-center gap-2">
-
-                                    <button className="absolute top-1.5 right-3 text-xl text-gray-400 hover:text-gray-600 cursor-pointer" onClick={()=> router.back()}>
-                                        ×
-                                    </button>
-
-                                    <UserRoundPen className="mx-auto h-20 w-20 text-blue-500 mb-4" />
-
-                                    <h1 className="text-gray-700 text-base font-medium mb-2">
-                                        Complete Your Profile
-                                    </h1>
-
-                                    <p className="text-sm text-gray-500 mb-6">
-                                        Please complete your profile before creating a course.
-                                    </p>
-
-                                    <Link href={`/profile/edit/${session?.user?.username}`} className="group px-4 py-2 flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-3xl font-medium overflow-hidden relative border border-blue-600">
-                                    <span className="relative z-10">Go to profile</span>
-                                    <ArrowRight size={16} className="relative z-10 transition-transform group-hover:translate-x-1" />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 transform translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                                    </Link>
-                                </div>
-                            </div>
-                            
-                        )}
-                        
-                    </div>
-
-                </div>
-
+                <CreateCoursePopUp modalOption={modalOption} router={router} session={session} percentage={percentage}/>
             )}
             
 
             <h2 className="text-2xl font-bold mb-6">Course Management</h2>
-            <p className="text-sm text-gray-500 mb-6"> <Link href={"/mentor/courses"}>Course Management</Link> / <strong>Create Course</strong></p>
+            <p className="text-sm text-gray-500 mb-6"> <Link href={"/mentor/courses"}>Course Management</Link> 
+                / <strong>Create Course</strong>
+            </p>
 
 
             <div className="mt-6 flex justify-end gap-4 my-2">
@@ -278,254 +184,243 @@ export default function CreateCourse(){
                 >Cancel</button>
 
                 <div className="flex items-center p-[3px] border border-blue-300 text-blue-500 rounded-lg">
-                    <button className={`p-2 px-3 rounded-md cursor-pointer ${activeOption === 'true' ? 'bg-blue-500 text-white w-full' : ''}`}
-                    onClick={()=>setActiveOption('true')}
+                    <button className={`p-2 px-3 rounded-md cursor-pointer ${isPaid === true ? 'bg-blue-500 text-white w-full' : ''}`}
+                    onClick={()=>setIsPaid(true)}
                     >Paid</button>
-                    <button className={`p-2 px-3 rounded-md cursor-pointer ${activeOption === 'false' ? 'bg-blue-500 text-white w-full' : ''}`}
-                    onClick={()=>setActiveOption('false')}
+                    <button className={`p-2 px-3 rounded-md cursor-pointer ${isPaid === false ? 'bg-blue-500 text-white w-full' : ''}`}
+                    onClick={()=>setIsPaid(false)}
                     >Free</button>
                 </div>
                 
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer" onClick={() => form.handleSubmit()}
+                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer" 
+                onClick={handleSubmit(onSubmit)}
                 >Save & Continue</button>
             </div>
 
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
-                {/* Form Inputs */}
-                <div className="space-y-4">
 
-                    <div>
-                        <form.Field 
-                            name="title"
-                            validators={{
-                                onChange: ({ value }) =>
-                                !value
-                                    ? 'A title is required'
-                                    : value.length < 5
-                                    ? 'Title must be at least 5 characters'
-                                    : undefined,
-                            }}
-                            children={(field) => (  
-                                <div>
-                                    <label className="block mb-1 font-medium">Course Title</label>
-                                    <input
-                                        className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
-                                        id={field.name}
-                                        name={field.name}
-                                        value={field.state.value}
-                                        type="text"
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                    />
-                                    {!field.state.meta.isValid && (
-                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
-                                    )}
-                                </div>
-                            )}
-                        />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
+
+                <div className="space-y-4">                    
+
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="title" className="font-medium text-gray-800">Course Title</label>
+                        <input {...register("title")} type="text" 
+                        className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500" />
+                         {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
                     </div>
-                    
-                    {activeOption === 'true' && 
-                        <div>
-                            <form.Field 
-                                name="price"
-                                validators={{
-                                    onChange: ({ value }) => undefined,
-                                }}
-                                children={(field) => (  
-                                    <div>
-                                        <label className="block mb-1 font-medium">Course Price</label>
-                                        <input
-                                            className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            type="number"
-                                            onChange={(e) => field.handleChange(e.target.value)}
-                                        />
-                                        {!field.state.meta.isValid && (
-                                            <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
-                                        )}
-                                    </div>
-                                )}
-                            />
+
+                    {isPaid === true && 
+                        <div className="flex flex-col gap-1">
+                            <label htmlFor="price" className="font-medium text-gray-800">Course Price</label>
+                            <input {...register("price")} type="number" className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500" />
+                            {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
                         </div>
                     }
 
-
-
-                    <div>
-                        <form.Field 
-                            name="category"
-                            validators={{
-                                onChange: ({ value }) =>
-                                !value ? 'A category is required' : undefined,
-                            }}
-                            children={(field) => (
-                                <div>
-                                    <label className="block mb-1 font-medium">Course Category</label>
-
-                                    <select 
-                                        id={field.name}
-                                        name={field.name}
-                                        className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                    >
-                                        <option>Select category</option>
-                                        <option value="Design">Design</option>
-                                        <option value="Development">Development</option>
-                                    </select>
-                                    
-                                    {!field.state.meta.isValid && (
-                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
-                                    )}
-                                </div>
-                            )}
-                        />
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="category" className="font-medium text-gray-800">Course Category</label>
+                        <select id="category" {...register("category")} defaultValue=""
+                            className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500"
+                        >
+                            <option value="" disabled>Select category</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="obile Development">Mobile Development</option>
+                            <option value="UI/UX Design">UI/UX Design</option>
+                            <option value="Backend Development">Backend Development</option>
+                            <option value="Frontend Development">Frontend Development</option>
+                        </select>
+                        {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
                     </div>
 
-                    
+                    <Controller
+                        name="tags"
+                        control={control}
+                        render={({ field }) => {
+                            const [tagInput, setTagInput] = useState('');
 
-                    <div>
+                            const handleAddTag = () => {
+                                const newTag = tagInput.trim();
+                                if (newTag && !field.value.includes(newTag)) {
+                                    field.onChange([...field.value, newTag]);
+                                    setTagInput('');
+                                }
+                            };
 
+                            const handleRemoveTag = (tag: string) => {
+                                field.onChange(field.value.filter(t => t !== tag));
+                            };
 
-                        
-                        <label className="block mb-1 font-medium">Course Tag</label>
-                        <input type="text" placeholder="Add tag" className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500" />
-                        <div className="mt-2 flex gap-2 flex-wrap">
-                            {tags.map((tag, idx) => (
-                                <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-sm">{tag}</span>
-                            ))}
-                        </div>
-
-
-                        {/* <form.Field 
-                            name="title"
-                            validators={{
-                                onChange: ({ value }) =>
-                                !value
-                                    ? 'A title is required'
-                                    : value.length < 5
-                                    ? 'Title must be at least 3 characters'
-                                    : undefined,
-                            }}
-                            children={(field) => (
-                                <div>
-                                    <label className="block mb-1 font-medium">Course Tag</label>
+                            return (
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="tags" className="font-medium text-gray-800">Course Tag</label>
+                                <div className="relative">
                                     <input
-                                        className="w-full border border-gray-300 p-2 rounded"
-                                        id={field.name}
-                                        name={field.name}
-                                        value={field.state.value}
                                         type="text"
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                    />
-                                    {!field.state.meta.isValid && (
-                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
-                                    )}
-                                </div>
-                            )}
-                        />
-                        <div className="mt-2 flex gap-2 flex-wrap">
-                            {tags.map((tag, idx) => (
-                                <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full text-sm">{tag}</span>
-                            ))}
-                        </div> */}
-                    </div>
+                                        value={tagInput}
+                                        onChange={(e) => setTagInput(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                                        placeholder="Enter tag and press Enter"
+                                        className="w-full border border-gray-300 p-2 pr-10 rounded outline-none focus:border-gray-500"
 
-                    <div>
-                        <form.Field 
-                            name="description"
-                            validators={{
-                                onChange: ({ value }) =>
-                                !value
-                                    ? 'A description is required'
-                                    : value.length < 150
-                                    ? 'Minimum 150 characters and maximum of 250 chars required'
-                                    :value.length > 250 ? 'Maximum 250 characters' : undefined,
-                            }}
-                            children={(field) => (
-                                <div>
-                                    <label className="block mb-1 font-medium">Course Description</label>
-                                    <textarea
-                                        className="w-full border border-gray-300 p-2 rounded h-40 outline-none focus:border-gray-500"
-                                        id={field.name}
-                                        name={field.name}
-                                        value={field.state.value}
-                                        onChange={(e) => field.handleChange(e.target.value)}
                                     />
-                                    {!field.state.meta.isValid && (
-                                        <p className="text-xs text-orange-500 mt-1">{field.state.meta.errors}</p>
-                                    )}
+                                    <button type="button" className="absolute bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-sm right-1.5 top-[5.5px] cursor-pointer" 
+                                    onClick={handleAddTag}>Add Tag</button>
                                 </div>
-                            )}
-                        />
+
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {field.value.map((tag, index) => (
+                                        <div key={index} className="bg-blue-100 text-sm text-blue-800 px-2.5 py-1.5 rounded-full flex items-center gap-2">
+                                            {tag}
+                                            <button type="button" className="text-red-500 hover:text-red-700 font-bold text-xs cursor-pointer"
+                                            onClick={() => handleRemoveTag(tag)}>
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                {errors.tags && <p className="text-red-500 text-sm">{errors.tags.message}</p>}
+                            </div>
+                            );
+                        }}
+                    />
+
+
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="description" className="font-medium text-gray-800">Course description</label>
+                        <textarea rows={9} {...register("description")} className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500" />
+                        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                     </div>
+                    
                 </div>
             
-                {/* Uploads + Takeaways */}
+
+
                 <div className="space-y-6">
 
                     <div className="flex gap-4">
 
-                        <div className="w-1/2">
-                            <h1 className="block mb-1 font-medium">Upload Thumbnail</h1>
-                            {imageFile ? (
-                                <div className="border-2 border-gray-200 w-full aspect-square relative">
-                                    <img src={imageFile.url} alt="Thumbnail" className="object-cover w-full h-full rounded-md"/>
-                                    <button type="button" onClick={()=>setImageFile(null)} className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100">
-                                        <Trash2 size={20} className="text-red-500" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <label
-                                htmlFor="thumbnail"
-                                className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
-                                >
-                                    <CloudUpload size={32} />
-                                    <p className="text-sm">Upload thumbnai</p>
-                                    <p className="text-xs text-orange-500">*Upload landscape image</p>
-                                </label>
-                            )}
-                            
-                            <input id="thumbnail" type="file" accept="image/*" className="hidden" onChange={handleThumbnail}/>
+                        <Controller
+                            name="thumbnail"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <div className="w-1/2">
+                                <h1 className="block mb-1 font-medium">Upload Thumbnail</h1>
 
-                            <p className="text-xs text-orange-500 mt-1">{toggles.showImageError && "Please upload a valid image file"}</p>
-                        </div>
+                                {imageFile ? (
+                                    <div className="border-2 border-gray-200 w-full aspect-square relative">
+                                        <img
+                                            src={imageFile.url}
+                                            alt="Thumbnail"
+                                            className="object-cover w-full h-full rounded-md"
+                                        />
+                                        <button type="button"
+                                            className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100"
+                                            onClick={() => {
+                                                field.onChange(undefined); 
+                                                setImageFile(null);
+                                                imageInputRef.current!.value = '';
+                                            }}
+                                        >
+                                            <Trash2 size={20} className="text-red-500" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label htmlFor="thumbnail" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
+                                    >
+                                        <CloudUpload size={32} />
+                                        <p className="text-sm">Upload thumbnail</p>
+                                    </label>
+                                )}
 
-                        {activeOption === 'true' && (
-                        <div className="w-1/2">
-                            <h1 className="block mb-1 font-medium">Upload Intro Video</h1>
-                            {videoFile ? (
-                                <div className="border-2 border-gray-200 w-full aspect-square relative">
-                                    {/* <img src={image.url} alt="Thumbnail" className="object-cover w-full h-full rounded-md"/> */}
-                                    <video
-                                        src={videoFile.url}
-                                        controls
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <button type="button" onClick={()=>setVideoFile(null)} className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100">
-                                        <Trash2 size={20} className="text-red-500" />
-                                    </button>
+                                <input
+                                    id="thumbnail"
+                                    type="file"
+                                    accept="image/*"
+                                    ref={imageInputRef}
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const url = URL.createObjectURL(file);
+                                        setImageFile({ file, url });
+                                        field.onChange(e.target.files);
+                                    }}
+                                />
+
+                                {fieldState.error && (
+                                    <p className="text-sm text-red-500 mt-1">
+                                        {fieldState.error.message}
+                                    </p>
+                                )}
                                 </div>
-                            ) : (
-                                <label
-                                htmlFor="introVideo"
-                                className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
-                                >
-                                    <MonitorUp size={32} />
-                                    <p className="text-sm">Upload intro video</p>
-                                </label>
                             )}
-                            
-                            <input id="introVideo" type="file" accept="video/*" className="hidden" onChange={handleIntroVideo}/>
-                            <p className="text-xs text-orange-500 mt-1">{toggles.showVideoError && "Please upload a valid video file"}</p>
-                        </div>
+                        />
+
+
+                        {isPaid === true && (
+                        <Controller
+                            name="introVideo"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <div className="w-1/2">
+                                <h1 className="block mb-1 font-medium">Upload Intro Video</h1>
+
+                                {videoFile ? (
+                                    <div className="border-2 border-gray-200 w-full aspect-square relative">
+                                        <video
+                                            src={videoFile?.url}
+                                            controls
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <button type="button"
+                                            className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100"
+                                            onClick={() => {
+                                                field.onChange(undefined); 
+                                                setVideoFile(null);
+                                                videoInputRef.current!.value = '';
+                                            }}
+                                        >
+                                            <Trash2 size={20} className="text-red-500" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label htmlFor="introVideo" className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
+                                    >
+                                        <MonitorUp size={32} />
+                                        <p className="text-sm">Upload intro video</p>
+                                    </label>
+                                )}
+
+                                <input
+                                    id="introVideo"
+                                    type="file"
+                                    accept="video/*"
+                                    ref={videoInputRef}
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const mediaUrl = URL.createObjectURL(file);
+                                        setVideoFile({ file, url: mediaUrl });
+                                        field.onChange(e.target.files);
+                                    }}
+                                />
+
+                                {fieldState.error && (
+                                    <p className="text-sm text-red-500 mt-1">
+                                        {fieldState.error.message}
+                                    </p>
+                                )}
+                                </div>
+                            )}
+                        />
                         )}
+
 
                     </div>
 
-                    {/* Takeaways */}
+
                     <div>
                         <h2 className="font-medium mb-2">Take Aways</h2>
                         <ul className="list-disc list-inside text-sm space-y-1 text-gray-600">
@@ -537,163 +432,12 @@ export default function CreateCourse(){
                         <li>Keep the course up-to-date by regularly reviewing and updating the content to ensure its relevance and accuracy.</li>
                         </ul>
                     </div>
-
                 </div>
-
             </div>
-            
-            
 
-
-            {/* <form
-                onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                void form.handleSubmit()
-                }}
-            > */}
-
-
-            
-
-
-                {/* <form.Field 
-                    name="age"
-                    validators={{
-                        onChange: ({ value }) =>
-                          !value 
-                            ? 'A first name is required'
-                            : value.length < 3
-                              ? 'First name must be at least 3 characters'
-                              : undefined,
-                    }}
-                    children={(field) => (
-                        <div className="flex flex-col gap-2">
-                        <label htmlFor={field.name}>Course Title</label>
-                        <input
-                            className="border border-gray-300 p-2 rounded-lg w-fit"
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            type="text"
-                            onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                        {!field.state.meta.isValid && (
-                            <p className="text-xs text-rose-400">{field.state.meta.errors}</p>
-                        )}
-                        </div>
-                    )}
-                /> */}
-
-                
-
-
-
-
-
-
-      {/* <button
-        type="submit"
-        onClick={() => form.handleSubmit()}
-        className="bg-blue-500 text-white p-3 font-semibold rounded-lg cursor-pointer mt-3"
-      >
-        Submit and back to menu
-      </button> */}
-
-
-
-
-
-
-            {/* <div className="flex items-center gap-4 w-fit mt-10">
-
-                <div className="w-64 mx-auto">
-                    <h1 className="font-semibold mb-2">Upload Thumbnail</h1>
-                    {imageFile ? (
-                        <div className="border-2 border-gray-200 w-full aspect-square relative">
-                            <img src={imageFile.url} alt="Thumbnail" className="object-cover w-full h-full rounded-md"/>
-                            <button type="button" onClick={()=>setImageFile(null)} className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100">
-                                <Trash2 size={20} className="text-red-500" />
-                            </button>
-                        </div>
-                    ) : (
-                        <label
-                        htmlFor="thumbnail"
-                        className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
-                        >
-                            <CloudUpload size={32} />
-                            <p className="text-sm">Upload thumbnai</p>
-                            <p className="text-xs text-orange-500">*Upload landscape image</p>
-                        </label>
-                    )}
-                    
-                    <input id="thumbnail" type="file" accept="image/*" className="hidden" onChange={handleThumbnail}/>
-
-                    <p className="text-xs text-red-500">{toggles.showImageError && "Please upload a valid image file"}</p>
-                </div>
-
-                <div className="w-64 mx-auto">
-                    <h1 className="font-semibold mb-2">Upload Intro Video</h1>
-                    {videoFile ? (
-                        <div className="border-2 border-gray-200 w-full aspect-square relative">
-                            <video
-                                src={videoFile.url}
-                                controls
-                                className="w-full h-full object-cover"
-                            />
-                            <button type="button" onClick={()=>setVideoFile(null)} className="absolute cursor-pointer top-2 right-2 bg-white p-1 rounded-full shadow hover:bg-gray-100">
-                                <Trash2 size={20} className="text-red-500" />
-                            </button>
-                        </div>
-                    ) : (
-                        <label
-                        htmlFor="introVideo"
-                        className="cursor-pointer border-2 border-dashed border-gray-300 w-full aspect-square flex flex-col justify-center items-center gap-2 text-gray-500 hover:border-gray-400 transition-all"
-                        >
-                            <MonitorUp size={32} />
-                            <p className="text-sm">Upload intro video</p>
-                            <p className="text-xs text-orange-500">*Upload landscape image</p>
-                        </label>
-                    )}
-                    
-                    <input id="introVideo" type="file" accept="video/*" className="hidden" onChange={handleIntroVideo}/>
-                </div>
-
-            </div> */}
-
-
-
-
-            {/* <div className="flex items-center gap-2 w-fit mt-10">
-                <button className="bg-slate-100 text-blue-400 font-semibold p-3 rounded-lg cursor-pointer">Cancel</button>
-                <button className="bg-blue-400 text-white p-3 font-semibold rounded-lg cursor-pointer">Create Course</button>
-            </div> */}
-
-            {/* <div className="min-h-screen p-10">     
-                <h1 className="text-3xl font-bold mb-6">Upload a Course Video</h1>
-
-                <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFile}
-                    disabled={uploading}
-                    className="mb-4 border border-gray-300 p-1.5 cursor-pointer"
-                />
-
-                <button
-                    onClick={handleUpload}
-                    disabled={!videoFile || uploading}
-                    className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
-                >
-                    {uploading ? 'Uploading...' : 'Upload'}
-                </button>
-
-                {message && <p className="mt-4 text-lg">{message}</p>}
-
-                <button className="text-white bg-blue-500 p-3 text-xl" onClick={()=>handleUpload()}>upload</button> 
-            </div> */}
-
+           
         </div>
 
     )
 }
+

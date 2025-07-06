@@ -208,11 +208,10 @@ export async function GetVideo(courseId:string, videoId:string){
 }
 
 
-export async function CreateCourseData(formData:FormData){
+export async function CreateCourseData(formData:any){
 
   const cookie = (await cookies()).get("access_token")?.value;
 
-  console.log("requested🔴", formData);
   const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/course/create/`, formData, {
     headers: {
       "Content-Type": "application/json",
@@ -422,3 +421,32 @@ export async function UpdateProfile(data:any){
   return res;
 
 }
+
+
+
+export async function DeleteCourseSection(sectionId: string) {
+  const res = await apiService.delete(`/course/section/${sectionId}/`,{
+    requiresAuth: true,
+  })
+  .catch(error => {
+    console.error("Delete error:", error);
+  })
+
+  return res;
+}
+
+
+export async function UpdateCourseSection(sectionId: string, data:any) {
+
+  const res = await apiService.patch(`/course/section/${sectionId}/`, data, {
+    requiresAuth: true,
+  })
+  .catch(error => {
+    console.error("Delete error:", error);
+  })
+
+  return res;
+}
+
+
+

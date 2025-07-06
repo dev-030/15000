@@ -4,6 +4,7 @@ import CourseCard from "./courseCard";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { apiService } from "@/lib/actions/api";
+import MyCourseCard from "./myCourseCard";
 
 
 
@@ -20,9 +21,7 @@ export default async function MyCoursesComponent(){
     .catch((error) => {
         console.error({"ERROR":error.message});
     })
-      
 
-    console.log(data);
       
   return(
     <div>
@@ -37,52 +36,7 @@ export default async function MyCoursesComponent(){
 
                 <div className="grid grid-cols-1 min-[830px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
                     {data?.map((course:any) => (
-                        <div key={course.id} className="bg-white rounded-lg shadow p-2 border border-gray-200">
-                            <div className="relative">
-                                <img
-                                src={course.thumbnail}
-                                alt={course.title}
-                                className="w-full h-40 object-cover rounded"
-                                />
-                                <span className={`absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-full ${
-                                course.status === 'In Progress'
-                                    ? 'bg-green-200 text-green-800'
-                                    : course.status === 'New Started'
-                                    ? 'bg-yellow-200 text-yellow-800'
-                                    : course.status === 'Completed'
-                                    ? 'bg-blue-200 text-blue-800'
-                                    : 'bg-gray-200 text-gray-800'
-                                }`}>
-                                {course.status}
-                                </span>
-                            </div>
-                            <h3 className="mt-2 text-md font-semibold">
-                                {course.course_name}
-                            </h3>
-                            <p className="text-sm text-gray-600 pt-2">By {course.mentor_name}</p>
-                            <div className="mt-2 text-sm text-gray-500">
-                                {course.status === 'Completed' && course.completedAt && (
-                                <p>Completed: {course.completedAt}</p>
-                                )}
-                                {course.status !== 'Completed' && course.lastAccessed && (
-                                <p>Last accessed: {course.lastAccessed}</p>
-                                )}
-                            </div>
-                            <div className="mt-2">
-                                <div className="bg-gray-200 h-2 rounded-full">
-                                <div
-                                    className="bg-blue-500 h-2 rounded-full"
-                                    style={{ width: `${course.progress}%` }}
-                                ></div>
-                                </div>
-                            </div>
-                            <div className="mt-3">
-                                <Link href={`/my-courses/${course.id}`} className="px-4 py-1 text-sm bg-blue-600 text-white rounded">
-                                    {course.status === 'Completed' ? 'Review' : course.progress > 0 ? 'Continue' : 'Start'}
-                                </Link>
-                            </div>
-                            
-                        </div>
+                        <MyCourseCard course={course} key={course.id}/>
                     ))}
                 </div>
             </div>
@@ -109,7 +63,7 @@ export default async function MyCoursesComponent(){
                 <div className="mt-10">
                     <h3 className="text-left text-lg font-semibold mb-2">Recommended for you</h3>
                     <div className="grid grid-cols-1 min-[830px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
-                        {data.map((course:any) => (
+                        {data?.map((course:any) => (
                             <Link href={`/courses/${course.id}`} key={course.id}>
                                 <CourseCard course={course}/>
                             </Link>

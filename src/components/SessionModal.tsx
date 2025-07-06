@@ -1,7 +1,8 @@
 import { CreateSession } from "@/lib/actions/actions";
-import axios from "axios";
-import { Clock, DollarSign, Plus, X, Trash2 } from "lucide-react";
+import { Clock, DollarSign, Plus, X, Trash2, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import toast from 'react-hot-toast';
+import { mutate } from "swr";
 
 interface CreateSessionModalProps {
   isOpen: boolean;
@@ -21,8 +22,7 @@ export default function CreateSessionModal({ isOpen, onClose }: CreateSessionMod
   const [currentTime, setCurrentTime] = useState(""); // HH:mm
   const [amPm, setAmPm] = useState("AM");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
 
   const [imageBase64, setImageBase64] = useState<string | null>(null);
 
@@ -81,6 +81,7 @@ export default function CreateSessionModal({ isOpen, onClose }: CreateSessionMod
   const handleSubmit = async(e: any) => {
 
     e.preventDefault();
+    setIsLoading(true);
 
     const filteredDays = Object.entries(daySlots)
     .filter(([_, slots]) => slots.length > 0)
@@ -98,29 +99,42 @@ export default function CreateSessionModal({ isOpen, onClose }: CreateSessionMod
       uploaded_thumbnail: imageBase64,
     };
     
-    const response = await CreateSession(data);
-
-    if(response === 201) onClose();
+    try {
+      const response = await CreateSession(data);
+      console.log(response)
+      if(response === 201){
+        toast.success('Session created successfully.');  
+        onClose(); 
+        mutate('/api/session-list');
+      }
+    }catch(error){
+      console.error(error);
+      toast.error('Something went wrong.');
+    }finally {
+      setIsLoading(false);
+      onClose()
+    }
 
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">      
       <div className="bg-white rounded-lg w-full max-w-4xl">
+
         <div className="bg-indigo-600 text-white py-4 px-6 rounded-t-lg flex justify-between items-center">
           <h2 className="text-lg font-medium">Create New Session</h2>
           <button onClick={onClose} className="text-white hover:text-gray-200 cursor-pointer">
             <X size={20} />
           </button>
         </div>
+
         <form onSubmit={handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column: Core Info */}
+
             <div>
 
-                 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Session Title</label>
                 <input type="text" name="title" placeholder="e.g. Web Development Mentoring" className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-500" required />
@@ -217,7 +231,15 @@ export default function CreateSessionModal({ isOpen, onClose }: CreateSessionMod
           </div>
            <div className="flex justify-end mt-6 gap-2">
                 <button type="button" onClick={onClose} className="border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-100 transition-all duration-300 cursor-pointer">Cancel</button>
-                <button type="submit" className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition-all duration-300 cursor-pointer">Create Session</button>
+                <button type="submit" disabled={isLoading} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer">
+                  {isLoading ? (<div className="flex items-center gap-2">
+                    <span>Creating</span>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-l-transparent rounded-full animate-spin" />
+                  </div>): (<>
+                    <span>Create Session</span>
+                  </>
+                  )}
+                </button>
           </div>
         </form>
       </div>

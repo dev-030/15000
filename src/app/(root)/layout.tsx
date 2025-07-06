@@ -53,7 +53,7 @@ export default function AppLayout({children}:{children:React.ReactNode}){
                     />
                 )}
 
-                <main className={`flex-1 ${showSidebar ? 'ml-0 min-[700px]:ml-60' : 'ml-0'} transition-all duration-100 bg-gray-50`}>
+                <main className={`flex-1 ${showSidebar ? 'ml-0 min-[700px]:ml-60' : 'ml-0'} transition-all duration-100`}>
                     <div className="p-4 container mx-auto">
                         {children}
                     </div>        

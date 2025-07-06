@@ -1,18 +1,28 @@
-// components/LockScreen.tsx
 'use client';
+
 
 import { useState, useEffect } from 'react';
 
 const CORRECT_PASSWORD = 'edcluster123'; 
+const TRUSTED_REFERRER = 'https://learnmore.edcluster.com'; 
+
 
 export default function LockScreen({ children }: { children: React.ReactNode }) {
+
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  
+  
   useEffect(() => {
-    const unlocked = localStorage.getItem('isUnlocked') === 'true';
-    setIsUnlocked(unlocked);
+    const isLocalUnlocked = localStorage.getItem('isUnlocked') === 'true';
+    const cameFromTrustedSite = document.referrer.startsWith(TRUSTED_REFERRER);
+    
+    if (isLocalUnlocked || cameFromTrustedSite) {
+      localStorage.setItem('isUnlocked', 'true');
+      setIsUnlocked(true);
+    }
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,7 +35,7 @@ export default function LockScreen({ children }: { children: React.ReactNode }) 
     }
   };
 
-  if (isUnlocked) return <>{children}</>;
+  if (isUnlocked) return <>{children}</>
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
