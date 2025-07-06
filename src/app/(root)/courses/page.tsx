@@ -20,11 +20,11 @@ export default async function Courses({ searchParams }: any) {
         </div>
 
 
-        <Suspense  fallback={<p>Loading filters…</p>}>  
+        {/* <Suspense  fallback={<p>Loading filters…</p>}>  
           <CourseFilters searchParams={params}/>
-        </Suspense>
+        </Suspense> */}
 
-        <Suspense  fallback={<p>Loading courses…</p>}>  
+        <Suspense fallback={<p>Loading courses…</p>}>  
           <CourseList params={params}/>
         </Suspense>
 

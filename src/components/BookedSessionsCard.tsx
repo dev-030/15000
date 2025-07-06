@@ -1,4 +1,5 @@
 'use client';
+import { AcceptRescheduleTime, CancelRescheduleRequest, PayNow } from '@/lib/actions/actions';
 import {
   Clock,
   AlertCircle,
@@ -10,12 +11,14 @@ import {
   ClockFading,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { mutate } from 'swr';
 
 
 
 
 export default function BookedSessionsCard({ data }: { data: any }) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [loading, setLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,6 +27,47 @@ export default function BookedSessionsCard({ data }: { data: any }) {
 
     return () => clearInterval(interval);
   }, []);
+
+
+
+  const onAcceptReschedule = async (sessionId:any) => {
+    setLoading(sessionId);
+    try {
+      await AcceptRescheduleTime({"cons_id": sessionId});
+    } catch (error) {
+      console.error(error);
+    }finally {
+      mutate('/api/booked-sessions'); 
+      setLoading(null);
+    }
+  };
+
+
+  const onCancel = async (sessionId:any) => {
+    setLoading(sessionId);
+    try {
+      await CancelRescheduleRequest({"cons_id": sessionId});
+    } catch (error) {
+      console.error(error);
+    }finally {
+      mutate('/api/booked-sessions'); 
+      setLoading(null);
+    }
+  };
+
+
+  const onPayNow = async (sessionId:any) => {
+    setLoading(sessionId);
+    try {
+      await PayNow({"cons_id": sessionId});
+    } catch (error) {
+      console.error(error);
+    }finally {
+      mutate('/api/booked-sessions'); 
+      setLoading(null);
+    }
+  }
+  
 
   const timeRemaining = (targetTime: string) => {
     const now = currentTime;
@@ -45,7 +89,6 @@ export default function BookedSessionsCard({ data }: { data: any }) {
   };
 
 
-  console.log(data.results[0])
 
   return (
     <div>
@@ -98,7 +141,10 @@ export default function BookedSessionsCard({ data }: { data: any }) {
                       Declined
                     </>
                   ) : data.status === 'H' ? (
-                    <>Paid and Scheduled waiting</>
+                    <>
+                      <CircleCheck size={15} />
+                      Paid and Scheduled
+                    </>
                   ) : data.status === 'X' ? (
                     <>
                       <CircleX size={15} />
@@ -203,18 +249,48 @@ export default function BookedSessionsCard({ data }: { data: any }) {
                   <p className="text-gray-700 text-base">
                     The mentor has requested to reschedule this session. Do you accept?
                   </p>
-                  <div className='flex items-center justify-center gap-2 pt-2 text-sm md:text-base '>
-                    <button className='text-gray-600 p-2 hover:bg-slate-100 bg-white border border-slate-400 rounded-md  flex-1/3 cursor-pointer'
-                    onClick={()=> console.log("Cancel", data.id)}
-                    >Cancel</button>
-                    <button className='text-white p-2 bg-blue-500 hover:bg-blue-600 rounded-md  flex-2/3 cursor-pointer font-semibold'
-                    onClick={()=> console.log("Accept", data.id)}
-                    >Accept</button> 
-                  </div>
+                  {loading === data.id ? (
+                    <div className='text-gray-500 mt-6 p-2 px-5 bg-white border border-slate-400 rounded-md flex items-center gap-2 w-fit mx-auto'>
+                      <h1>Processing</h1>
+                      <div className="w-5 h-5 border-1 border-blue border-l-transparent rounded-full duration-75 animate-spin" />
+                    </div> 
+                  ):(
+                    <div className='flex items-center justify-center gap-2 pt-2 text-sm md:text-base '>
+                      <button className='text-gray-600 p-2 hover:bg-slate-100 bg-white border border-slate-400 rounded-md  flex-1/3 cursor-pointer'
+                      onClick={()=> onCancel(data.id)}
+                      >Cancel</button>
+                      <button className='text-white p-2 bg-blue-500 hover:bg-blue-600 rounded-md  flex-2/3 cursor-pointer font-semibold'
+                      onClick={()=> onAcceptReschedule(data.id)}
+                      >Accept</button> 
+                    </div>
+                  )}
                 </div>
               )}
 
               {data.status === 'A' && (
+                <div className="text-center space-y-4">
+                  <p className="text-blue-600 font-semibold text-sm uppercase tracking-wide">
+                    Request Accepted
+                  </p>
+                  <p className="text-gray-700 text-base">
+                    The mentor has accepted your request. Pay now to confirm the session.
+                  </p>
+                  {loading === data.id ? (
+                    <div className='text-gray-500 mt-6 p-2 px-5 bg-white border border-slate-400 rounded-md flex items-center gap-2 w-fit mx-auto'>
+                      <h1>Processing</h1>
+                      <div className="w-5 h-5 border-1 border-blue border-l-transparent rounded-full duration-75 animate-spin" />
+                    </div> 
+                  ):(
+                    <div className='flex items-center justify-center gap-2 pt-2 text-sm md:text-base '>                    
+                      <button className='text-white p-2 bg-blue-500 hover:bg-blue-600 rounded-md  flex-2/3 cursor-pointer font-semibold'
+                      onClick={()=> onPayNow(data.id)}
+                      >Pay Now</button> 
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {data.status === 'H' && (
                 <div className="text-center w-full space-y-1">
                   <p className="text-gray-700 text-sm">Starts in</p>
                   <div className="flex items-center justify-center gap-2 text-blue-600 text-lg tracking-wide">
@@ -258,7 +334,6 @@ export default function BookedSessionsCard({ data }: { data: any }) {
 
                 </div>
               )}
-
               
             </div>
           </div>

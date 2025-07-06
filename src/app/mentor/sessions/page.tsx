@@ -1,5 +1,5 @@
 'use client'
-import { RescheduleSession, SessionRequestsAccept } from "@/lib/actions/actions";
+import { AcceptRescheduleTime, RescheduleSession, SessionRequestsAccept } from "@/lib/actions/actions";
 import { X, CalendarCog, Check, ArrowRight, AlertCircle, Clock, Ban, CircleX, ClockFading, CircleCheck, Lock, Heading1 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,13 +28,14 @@ export default function SessionRequests() {
 
   const onReschedule = async (sessionId:any) => {
     const val = await RescheduleSession({consultancy_id: sessionId, suggested_time: dateTime});
-
-    console.log(val);
     
     if(val?.message === "Suggested time added."){
       mutate(); 
+      setOpen(false);
     }
   };
+
+
 
 
 
@@ -69,6 +70,7 @@ export default function SessionRequests() {
 
 
   if (isLoading) return <div className="text-center py-20">Loading...</div>;
+
 
 
   return (
@@ -118,7 +120,10 @@ export default function SessionRequests() {
                       Declined
                     </>
                   ) : session.status === 'H' ? (
-                    <>Paid and Scheduled waiting</>
+                    <>
+                      <CircleCheck size={15} />
+                      Paid and Scheduled
+                    </>
                   ) : session.status === 'X' ? (
                     <>
                       <CircleX size={15} />
@@ -205,8 +210,21 @@ export default function SessionRequests() {
 
 
               <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
-                {session.status === "A" ? (
-                  <div className="flex items-center w-full gap-1 text-lg tracking-wide">
+
+                {session.status === "A" && (
+                  <div className="w-full">
+                    <h1 className="text-gray-700 text-lg text-center">Waiting for the student's payment and confirmation.</h1>
+                  </div>
+                )}
+
+                {session.status === "S" && (
+                  <div className="w-full">
+                    <h1 className="text-gray-700 text-lg text-center">Waiting for the student's response.</h1>
+                  </div>
+                )}
+
+                {session.status === "H" && (
+                  <div className="flex flex-col md:flex-row  items-center w-full gap-1 text-lg tracking-wide">
 
                     {timeRemaining(session.scheduled_at).minutes>0 && <h1 className="text-gray-700">Starts In : </h1> }
 
@@ -237,19 +255,23 @@ export default function SessionRequests() {
                       </div>
                     </div>
 
-                    <div className="justify-end ml-auto">
+                    <div className="justify-end md:ml-auto">
                       <button onClick={() => window.open(session?.meet_link, '_blank')} disabled={session.meet_link=== null} className={`bg-blue-500  text-white px-4 py-2 rounded-md flex items-center gap-1 ${session.meet_link === null ? "":"cursor-pointer hover:bg-blue-600"} `}>
                         Start Session
                         <ArrowRight size={16}/>
                       </button>
                     </div>
                   </div>
-                ): session.status === "S" ? (
+                )}
+
+                {session.status === "X" && (
                   <div className="w-full">
-                    <h1 className="text-gray-700 text-lg text-center">Waiting for the student's response.</h1>
+                    <h1 className="text-gray-700 text-lg text-center">Student has cancelled the session reschedule request.</h1>
                   </div>
-                ): (
-                  <div className="flex items-center justify-between w-full gap-4 text-lg tracking-wide">
+                )}
+
+                {session.status === "R" && (
+                  <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4 text-lg tracking-wide">
                     <button className="border border-gray-300 hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-md flex items-center gap-1 justify-center cursor-pointer w-full">
                       <X size={18} />
                       Decline
@@ -268,6 +290,9 @@ export default function SessionRequests() {
                     </button>
                   </div>
                 )}
+
+
+                
               </div>
 
             </div>

@@ -5,6 +5,8 @@ import TopMentors from '@/components/TopMentors';
 import MentorCardsSkeleton from '@/components/MentorCardsSkeletorn';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
 
 
 
@@ -21,9 +23,9 @@ export default async function MentorsPage({ searchParams }: any) {
         <p className="text-gray-600 text-sm">Book 1:1 sessions with experts across various skills</p>
       </div>
 
-      <Suspense  fallback={<p>Loading filters…</p>}>
+      {/* <Suspense  fallback={<p>Loading filters…</p>}>
         <MentorFilters searchParams={params}/>
-      </Suspense>
+      </Suspense> */}
 
       <Suspense  fallback={<MentorCardsSkeleton/>}>
         <TopMentors /> 

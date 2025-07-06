@@ -309,6 +309,37 @@ export async function RescheduleSession(data:any){
 }
 
 
+export async function AcceptRescheduleTime(data:any){
+  const res = await apiService.post('/client/accept-suggested-time/', {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
+    console.log(error)
+  })  
+  return res;
+}
+
+
+export async function CancelRescheduleRequest(data:any){
+  const res = await apiService.post('/client/cancel-scheduled-consultancy/', {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
+    console.log(error)
+  })  
+  return res;
+}
+
+export async function PayNow(data:any){
+  const res = await apiService.post('/client/pay-consultancy/', {
+    requiresAuth: true,
+    body: JSON.stringify(data)
+  }).catch((error)=> {
+    console.log(error)
+  })  
+  return res;
+}
+
 
 // export async function SessionRequestsData(){
 

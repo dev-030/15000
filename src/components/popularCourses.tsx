@@ -9,8 +9,16 @@ import { apiService } from "@/lib/actions/api";
 export default async function PopularCourses(){
 
   const data = await apiService.get('/client/courses/').catch((error) => {
-      console.error({"ERROR":error.message});
+    console.error({"ERROR":error.message});
   })
+
+
+  const test = await apiService.get('/client/home/').catch((error) => {
+    console.error({"ERROR":error.message});
+  })
+
+  console.log(test);
+  
 
   return(
 
