@@ -6,9 +6,9 @@ import CourseList from "@/components/courseList";
 
 
 
-export default async function Courses({ searchParams }: any) {
+export default async function Courses() {
 
-  const params = await searchParams;
+  // const params = await searchParams;
 
   return (
     <>
@@ -24,9 +24,9 @@ export default async function Courses({ searchParams }: any) {
           <CourseFilters searchParams={params}/>
         </Suspense> */}
 
-        <Suspense fallback={<p>Loading courses…</p>}>  
+        {/* <Suspense fallback={<p>Loading courses…</p>}>  
           <CourseList params={params}/>
-        </Suspense>
+        </Suspense> */}
 
 
         <div className="flex justify-center mt-12">

@@ -5,7 +5,6 @@ import TopMentors from '@/components/TopMentors';
 import MentorCardsSkeleton from '@/components/MentorCardsSkeletorn';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { Metadata } from 'next';
 
 
 

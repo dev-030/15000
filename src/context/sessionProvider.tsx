@@ -1,5 +1,6 @@
 'use client'
-import { createContext, useContext } from "react";
+
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface SessionData {
   user?: {
@@ -9,11 +10,21 @@ interface SessionData {
     role: string;
     full_name: string;
   } | null;
+  loading: boolean;
 }
 
 export const context = createContext<SessionData | null>(null);
 
-export function SessionProvider({children, session}:{children:React.ReactNode, session:any}) {
+export function SessionProvider({ children }:{children:React.ReactNode}) {
+
+  const [session, setSession] = useState<SessionData>({ user: null, loading: true });
+
+  useEffect(() => {
+    fetch('/api/auth/session')
+    .then(res => res.json())
+    .then(data => setSession({ user: data.user, loading: false }))
+    .catch(() => setSession({ user: null, loading: false }));
+  }, []);
 
   return (
     <context.Provider value={session}>

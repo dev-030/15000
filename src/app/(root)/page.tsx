@@ -1,7 +1,6 @@
 import HomeBanner from "@/components/HomeBanner";
 import PopularCourses from "@/components/popularCourses";
 import TopMentors from "@/components/TopMentors";
-import { Metadata } from "next";
 import { Suspense } from "react";
 
 
@@ -27,7 +26,6 @@ export default function Home() {
         <TopMentors/>
       </Suspense>
 
-      
      </main>
   ); 
 }

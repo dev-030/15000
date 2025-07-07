@@ -10,7 +10,13 @@ export async function auth() {
   const access_token = (await cookies()).get("access_token")?.value;
 
   try {
-    const { full_name, username, user_id, profile_pic, role } = jwtDecode<JwtPayload & {full_name:string, username: string; user_id: string; profile_pic: string, role:string }>(access_token as string);
+    const { full_name, username, user_id, profile_pic, role } = jwtDecode<JwtPayload & {
+      full_name: string, 
+      username: string; 
+      user_id: string; 
+      profile_pic: string, 
+      role: string 
+    }>(access_token as string);
     return { user: {full_name, username, user_id, profile_pic, role } };
   } catch (err) {
     return null;

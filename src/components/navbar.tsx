@@ -14,7 +14,6 @@ export default function Navbar({state, setState}:{state:boolean, setState:React.
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [activeDropdown, setActiveDropdown] = useState<"userMenu" | null>(null);
 
-   
 
     // ---------- handle click outside ----------
     useEffect(() => {
