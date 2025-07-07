@@ -1,31 +1,34 @@
 import HomeBanner from "@/components/HomeBanner";
 import PopularCourses from "@/components/popularCourses";
 import TopMentors from "@/components/TopMentors";
+import { apiService } from "@/lib/actions/api";
 import { Suspense } from "react";
 
 
 
 
 
-export default function Home() {
+export default async function Home() {
 
+
+  const data = await apiService.get<any>('/client/home/')
+  .catch((error) => {
+    console.error({"ERROR":error.message});
+  })
+
+
+
+  console.log(data);
 
   return (
     <main>
       
-      <Suspense fallback={<p>Loading...</p>}>
-        <HomeBanner/>
-      </Suspense>
+      <HomeBanner/>
 
-      <Suspense fallback={<p>Loading...</p>}>
-        <PopularCourses/>
-      </Suspense>
+      <PopularCourses data={data?.courses}/>
 
-
-      <Suspense fallback={<p>Loading...</p>}>
-        <TopMentors/>
-      </Suspense>
-
+      <TopMentors/>
+     
      </main>
   ); 
 }

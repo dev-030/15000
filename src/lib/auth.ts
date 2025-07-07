@@ -52,7 +52,7 @@ export async function logOut() {
     ...(isProduction ? productionCookie : {}),
   });
 
-  redirect("/");
+  return { success: true };
   
 }
 

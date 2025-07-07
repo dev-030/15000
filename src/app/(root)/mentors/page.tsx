@@ -10,10 +10,10 @@ import Link from 'next/link';
 
 
 
-export default async function MentorsPage({ searchParams }: any) {
+export default async function MentorsPage({searchParams}:{searchParams:any}) {
  
   const params = await searchParams;
-
+  
   return (
     <main className="min-h-screen">
 

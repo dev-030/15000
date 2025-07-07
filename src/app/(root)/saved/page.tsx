@@ -9,12 +9,14 @@ import { Suspense } from "react";
 
 export default async function Saved() {
 
-  const user = await auth();
+  // const user = await auth();
 
   return (
     <div className="min-h-screen">
+
+      saved page...
     
-      {user ? (
+      {/* {user ? (
         <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center bg-white">
             <div className="flex flex-col items-center gap-4">
@@ -44,7 +46,7 @@ export default async function Saved() {
           </div>
         </div>
         )
-      }
+      } */}
   
     </div>
   );

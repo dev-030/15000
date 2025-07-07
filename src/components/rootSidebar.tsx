@@ -38,8 +38,6 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
         return true;
     });
 
-    
-
     return(
         <aside className="w-60 px-3 pt-4 flex flex-col justify-between h-screen">
 
@@ -101,6 +99,7 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
                     <span className="hover:text-gray-600 hover:underline cursor-pointer">About</span>
                     <span className="hover:text-gray-600 hover:underline cursor-pointer">Copyright</span>
                     <span className="hover:text-gray-600 hover:underline cursor-pointer">Contact us</span>
+                    {user?.user && user?.user?.role !== 'mentor' &&  <span className="hover:text-gray-600 hover:underline cursor-pointer">Become Mentor</span>}
                     <span className="hover:text-gray-600 hover:underline cursor-pointer">Terms</span>
                     <span className="hover:text-gray-600 hover:underline cursor-pointer">Privacy</span>
                 </div>

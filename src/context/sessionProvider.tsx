@@ -22,8 +22,12 @@ export function SessionProvider({ children }:{children:React.ReactNode}) {
   useEffect(() => {
     fetch('/api/auth/session')
     .then(res => res.json())
-    .then(data => setSession({ user: data.user, loading: false }))
-    .catch(() => setSession({ user: null, loading: false }));
+    .then(data => {
+      setSession({ user: data.user, loading: false });
+    })
+    .catch(() => {
+      setSession({ user: null, loading: false });
+    });
   }, []);
 
   return (
