@@ -10,7 +10,6 @@ export default async function MyCourses() {
 
   const user = await auth();
 
-  console.log(user);
 
   return (
     <div className="min-h-screen">

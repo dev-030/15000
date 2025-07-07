@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 
 
-export default function CreateCoursePopUp({modalOption, router, session, percentage}:{modalOption:string, router:any, session:any, percentage:number}){
+export default function CreateCoursePopUp({modalOption, router, session, percentage}:{modalOption:string, router:any, session:any, percentage:number}){     
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';

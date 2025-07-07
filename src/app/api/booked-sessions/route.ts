@@ -6,7 +6,6 @@ import { apiService } from '@/lib/actions/api';
 export async function GET() {
   try {
 
-    console.log("from booked sessions route", new Date().getMilliseconds())
 
     const response = await apiService.get<{ results: [] }>('/client/booked-sessions/', {
       requiresAuth: true,

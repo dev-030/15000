@@ -34,7 +34,6 @@ export default function ProfilePage() {
         );
     }
 
-    console.log(data);
 
     // get the user live data from online api......................................................
 

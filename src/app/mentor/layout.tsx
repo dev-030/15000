@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 
 export default function MentorLayout({children}:{children:React.ReactNode}){
 
-    const user = useClientSession();
+    const user = useClientSession()?.user
     const [isOpen, setIsOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<"userMenu" | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -35,7 +35,7 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
     }, []);
 
     
-    if (user?.user.role !== 'mentor') {
+    if (user?.role !== 'mentor') {
       redirect('/');  
     }
 
@@ -81,7 +81,7 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
                             className="flex items-center gap-2 hover:opacity-90 transition cursor-pointer "
                             >
                             <img
-                                src={user.user?.profile_pic}
+                                src={user?.profile_pic}
                                 alt="profile"
                                 className="h-9 w-9 rounded-full object-cover"
                             />
@@ -95,7 +95,7 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
                                     <House size={18} /> Home
                                 </Link>
 
-                                <Link href={`/profile/${user?.user?.username}`} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md"
+                                <Link href={`/profile/${user?.username}`} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md"
                                 onClick={() =>
                                     setActiveDropdown(activeDropdown === "userMenu" ? null : "userMenu")
                                 }
