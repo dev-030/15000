@@ -201,6 +201,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
   }, [open]);
 
 
+  console.log(data);
 
   return (
     <>
@@ -237,20 +238,20 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
 
                 <div className="mb-3">
                   <img 
-                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80" 
-                    alt="React Course" 
+                    src={data.thumbnail_url} 
+                    alt={data.title}
                     className="w-full h-48 object-cover rounded-md" 
                   />
                 </div>
 
                 <h2 className="text-base font-semibold text-gray-700 pb-1.5 leading-tight text-left line-clamp-2">
-                React Course: Mastering the Basics
+                  {data.title}
                 </h2>
 
                 <div className='space-y-4 pt-4.5'>
 
                   <div className='flex items-center gap-3'>
-                    <img src={data.mentor.profile_pic} alt="React Course" className="w-9 h-9 rounded-full" />
+                    <img src={data?.mentor?.profile_pic || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'} alt="React Course" className="w-9 h-9 rounded-full" />
                     <div className='flex flex-col items-start gap-0.5'>
                       <p className='text-xs text-gray-600 font-medium'>Mentor</p>
                       <h1 className='text-xs font-medium text-gray-800'>{data.mentor.full_name}</h1>
@@ -364,27 +365,29 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
                           Available times for {dayjs(selectedDate).format('dddd, MMM D')}
                         </h4>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {getTimeBlocksForDate(selectedDate).map(slot => {
-                            const isSelected = selectedTime === slot;
-
-                            return (
-                              <button
-                                key={slot}
-                                onClick={() => setSelectedTime(slot)}
-                                className={`
-                                  text-sm p-2 rounded-md font-medium transition-all duration-200 hover:scale-105 cursor-pointer border
-                                  ${isSelected 
-                                    ? 'text-blue-600 bg-blue-100 border-blue-400 transform scale-105' 
-                                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
-                                  }
-                                `}
-                              >
-                                {formatTime12Hour(slot)}
-                              </button>
-                            );
-                          })}
+                        <div className="max-h-50 overflow-y-auto">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {getTimeBlocksForDate(selectedDate).map(slot => {
+                              const isSelected = selectedTime === slot;
+                              return (
+                                <button
+                                  key={slot}
+                                  onClick={() => setSelectedTime(slot)}
+                                  className={`
+                                    text-sm p-2 rounded-md font-medium transition-all duration-200 hover:scale-105 cursor-pointer border
+                                    ${isSelected 
+                                      ? 'text-blue-600 bg-blue-100 border-blue-400 transform scale-105' 
+                                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                    }
+                                  `}
+                                >
+                                  {formatTime12Hour(slot)}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
+
                       </div>
                     )}
 

@@ -15,7 +15,6 @@ export default async function MentorSessionDetails({ params }: { params: Promise
     console.error({ "ERROR": error.message });
   });
 
-  console.log(data);
 
   if (!data) return <div className="text-center py-20">Loading session details...</div>;
 
