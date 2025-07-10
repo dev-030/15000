@@ -1,2 +1,11 @@
 @import "tailwindcss";
 @plugin 'tailwind-scrollbar';
+@plugin "@tailwindcss/typography";
+
+
+
+
+
+
+
+

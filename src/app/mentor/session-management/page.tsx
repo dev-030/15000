@@ -9,6 +9,7 @@ import CreateSessionModal from '@/components/SessionModal';
 import { SessionManagementData } from '@/lib/actions/actions';
 import useSWR from 'swr';
 import { Toaster } from 'react-hot-toast';
+import Link from 'next/link';
 
 
 interface Session {
@@ -32,16 +33,13 @@ export default function SessionManagement() {
   );
 
 
-
-
   return (
     <div className="p-6 min-h-screen">
 
       <div className=" rounded-lg min-h-screen">
 
         <Toaster/>
-        <CreateSessionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-
+        
         {isLoading ? (
           <div className="min-h-screen grid place-content-center">
               <p>Loading data...</p>
@@ -54,16 +52,22 @@ export default function SessionManagement() {
                   <h1 className="text-xl font-semibold text-gray-800">Manage Your Sessions</h1>
                   <p className="text-sm text-gray-600">Create and manage your mentoring sessions</p>
                 </div>
-              <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded flex items-center gap-2 cursor-pointer">
-                <Plus className="h-5 w-5 mr-1 text-white" />
-                Create New Session
-              </button>
+
+                <Link href="/mentor/session-management/create"  className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded flex items-center gap-2 cursor-pointer">
+                  <Plus className="h-5 w-5 mr-1 text-white" />
+                  Create New Session
+                </Link>
             </div>
           
             <div className="flex flex-wrap gap-6">
               {data?.results?.map((session:any) => (
                 <div key={session.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
                   <div className="flex justify-between items-start mb-4">
+
+                    <div className='w-16 h-16 rounded-full overflow-hidden'>
+                      <img src={session?.thumbnail_url} alt="" className='w-16 h-16 rounded-full object-cover' />
+                    </div>
+
 
                     <h3 className="font-medium text-lg text-gray-700">{session.title}</h3>
 
@@ -102,7 +106,7 @@ export default function SessionManagement() {
                   <div className="mb-4">
                     <h4 className="text-xs text-gray-700 mb-1">DESCRIPTION</h4>
                     <p className="text-sm text-gray-800">
-                      One-on-one mentoring session for web development. Get personalized guidance on HTML, CSS, JavaScript, and modern frameworks. Perfect for beginners and intermediate developers looking to improve their skills.
+                      {session.description}
                     </p>
                   </div>
 
@@ -112,10 +116,10 @@ export default function SessionManagement() {
                       <Edit size={15} className="mr-1" /> 
                       <p className='text-sm'>Manage Availability</p>
                     </button>
-                    <button className="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-0 rounded-lg flex items-center justify-center cursor-pointer">
+                    <Link href={`/mentor/session-management/${session.id}`} className="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-0 rounded-lg flex items-center justify-center cursor-pointer">
                       <Edit size={15} className="mr-1" /> 
                       <p className='text-sm'>Edit Session</p>
-                    </button>
+                    </Link>
                   </div>
 
 

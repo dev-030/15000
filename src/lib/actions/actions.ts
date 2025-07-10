@@ -424,6 +424,8 @@ export async function IsProfileComplete(){
     console.log(error)
   })
 
+  console.log(res)
+
   return res;
 
 }
@@ -481,3 +483,17 @@ export async function UpdateCourseSection(sectionId: string, data:any) {
 
 
 
+
+
+
+export async function UpdateSession(data:any){
+  
+  const res = await apiService.patch(`/mentor/update-gig/`, data, {
+    requiresAuth: true,
+  }).catch(error => {
+    console.error("Upload error:", error);
+  })
+
+
+  return res;
+}

@@ -1,6 +1,8 @@
 import BookingModal from "@/components/modal";
 import { apiService } from '@/lib/actions/api';
 import { Star } from "lucide-react";
+import parse from 'html-react-parser';
+
 
 export default async function MentorSessionDetails({ params }: { params: Promise<{ slug: string }> }) {
 
@@ -13,10 +15,13 @@ export default async function MentorSessionDetails({ params }: { params: Promise
     console.error({ "ERROR": error.message });
   });
 
+  console.log(data);
+
   if (!data) return <div className="text-center py-20">Loading session details...</div>;
 
   const mentor = data.mentor;
   const totalSlots = data.days.reduce((acc: number, day: any) => acc + day.time_blocks.length, 0);
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
@@ -53,6 +58,14 @@ export default async function MentorSessionDetails({ params }: { params: Promise
             {data.description}
           </p>
 
+
+          <div>
+            {
+              parse(data?.rich_description)
+            }
+          </div>
+
+
           {/* Instructor Info Block */}
           <div className="bg-gray-50 rounded-lg border border-slate-200 p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">About the Instructor</h2>
@@ -72,7 +85,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
         </div>
 
 
-        <div className="lg:w-1/3 w-full">
+        <div className="lg:w-1/3 w-full z-50">
           <div className="bg-white p-6 rounded-lg shadow-md sticky top-20 sm:top-24">
             <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Book Your Session</h3>
 
@@ -83,6 +96,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
             </div>
 
             <BookingModal timeSlots={data.days} data={data} />
+
           </div>
         </div>
       </div>

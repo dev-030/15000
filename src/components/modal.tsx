@@ -142,21 +142,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
 
 
 
-  useEffect(() => {
-    document.body.classList.toggle('overflow-hidden', open);
-    return () => { document.body.classList.remove('overflow-hidden'); };
-  }, [open]);
 
-
-  // useEffect(() => {
-  //   const handler = (e: KeyboardEvent) => {
-  //     if (e.key === 'Escape') {
-  //       setOpen(false)
-  //     };
-  //   };
-  //   if (open) window.addEventListener('keydown', handler);
-  //   return () => window.removeEventListener('keydown', handler);
-  // }, [open]);
 
 
   function getTimeBlocksForDate(date: string): string[] {
@@ -195,7 +181,25 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
     });
 
   }
-  
+
+
+
+  useEffect(() => {
+    document.body.classList.toggle('overflow-hidden', open);
+    return () => { document.body.classList.remove('overflow-hidden'); };
+  }, [open]);
+
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      };
+    };
+    if (open) window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open]);
+
 
 
   return (
@@ -211,9 +215,9 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
 
       {open && (
         user ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
 
-            <div className="rounded-xl flex shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all duration-300 ease-out" onClick={e => e.stopPropagation()}>
+            <div className="rounded-xl flex flex-col md:flex-row shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all duration-300 ease-out" onClick={e => e.stopPropagation()}>
 
               <div className='absolute top-3.5 right-3.5 border border-gray-400 text-gray-800 hover:text-white hover:bg-blue-600 hover:border-blue-600 cursor-pointer rounded-full p-1'
               onClick={() => {
@@ -229,7 +233,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
               
       
               {/* Left side*/}
-              <div className="w-2/5 bg-gradient-to-br from-slate-50 to-slate-50 p-5 border-r border-gray-100">
+              <div className="hidden md:block w-0 md:w-2/5 bg-gradient-to-br from-slate-50 to-slate-50 p-5 border-r border-gray-100">
 
                 <div className="mb-3">
                   <img 
@@ -289,7 +293,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
 
 
               {/* Right side */}
-              <div className="w-3/5 p-5 bg-white flex flex-col">
+              <div className="w-full md:w-3/5 p-5 bg-white flex flex-col">
                 {step === "select" && (
                   <>
 
@@ -496,7 +500,3 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
     </>
   );
 }
-
-
-
- 

@@ -13,7 +13,8 @@ import { useEffect, useRef, useState } from "react";
 
 export default function MentorLayout({children}:{children:React.ReactNode}){
 
-    const user = useClientSession()?.user
+    const session = useClientSession();
+
     const [isOpen, setIsOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<"userMenu" | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,11 +34,7 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
         checkProfile();
 
     }, []);
-
-    
-    if (user?.role !== 'mentor') {
-      redirect('/');  
-    }
+   
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -50,7 +47,8 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
         document.removeEventListener("mousedown", handleClickOutside);
       };
     }, []);
-  
+
+
     return(
         <div className="flex">
             
@@ -80,11 +78,15 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
                             }
                             className="flex items-center gap-2 hover:opacity-90 transition cursor-pointer "
                             >
-                            <img
-                                src={user?.profile_pic}
-                                alt="profile"
-                                className="h-9 w-9 rounded-full object-cover"
-                            />
+                            {session?.user?.profile_pic ? (
+                                    <img
+                                        src={session.user.profile_pic}
+                                        alt="profile"
+                                        className="h-9 w-9 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-9 w-9 rounded-full bg-gray-200 animate-pulse" />
+                            )}
                         </button>
 
                         <div className={`absolute right-0 mt-2.5 w-56 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden transition-all duration-150 z-50 
@@ -95,7 +97,7 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
                                     <House size={18} /> Home
                                 </Link>
 
-                                <Link href={`/profile/${user?.username}`} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md"
+                                <Link href={`/profile/${session?.user?.username}`} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md"
                                 onClick={() =>
                                     setActiveDropdown(activeDropdown === "userMenu" ? null : "userMenu")
                                 }
@@ -103,7 +105,7 @@ export default function MentorLayout({children}:{children:React.ReactNode}){
                                     <User size={18} /> Profile
                                 </Link>
                                 
-                                <button onClick={() => logOut()} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md cursor-pointer">
+                                <button onClick={async () => (await logOut()).success && (window.location.href='/')} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600 transition py-2 hover:bg-slate-100 px-3 rounded-md cursor-pointer">
                                     <LogOut size={18} /> Logout
                                 </button>
                             </div>

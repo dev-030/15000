@@ -6,6 +6,7 @@ import { SessionProvider } from "@/context/sessionProvider";
 import { Geist } from "next/font/google";
 import LockScreen from "@/components/lockScreen";
 import RootLoadingScreen from "@/components/rootLoadingScreen";
+import { auth } from "@/lib/auth";
 
 
 const geistSans = Geist({
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 
 
 export default async function RootLayout({ children}: Readonly<{children: React.ReactNode}>) {
+
 
   return (
     <html lang="en"> 

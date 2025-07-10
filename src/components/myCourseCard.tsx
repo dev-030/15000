@@ -15,14 +15,14 @@ export default function MyCourseCard({course}:{course:any}){
             await fetch(url).then(res => res.json())
         );
     };
-
+ 
     return(
 
         <Link prefetch 
         onMouseEnter={handleMouseEnter}
         href={`/my-courses/${course.id}`} key={course.id} className="bg-white rounded-lg shadow p-2 border border-gray-200"
         
-        >
+        > 
             <div className="relative w-full h-44">
                 <Image
                     src={course.thumbnail}

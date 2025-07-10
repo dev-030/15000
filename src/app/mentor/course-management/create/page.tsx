@@ -15,6 +15,30 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
 import imageCompression from "browser-image-compression";
 import CreateCoursePopUp from "@/components/createCoursePopUp";
+// import dynamic from 'next/dynamic';
+// import TipTap from "@/components/TipTap";
+import dynamic from 'next/dynamic';
+
+const TipTap = dynamic(() => import('@/components/TipTap'), {
+    ssr: false,
+    loading: () => (
+        <div className="flex flex-col gap-1">
+            <label className="font-medium text-gray-800">Course Description</label>
+            <div className="border border-gray-300 rounded-md p-4 mb-30">
+                <div className="control-group mb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <div className="border border-gray-300 p-2 bg-gray-50 rounded-md text-gray-700 text-sm opacity-50">
+                            Loading editor...
+                        </div>
+                    </div>
+                </div>
+                <div className="min-h-[120px] bg-white p-4 border border-gray-200 rounded-md opacity-50 flex items-center justify-center">
+                    <span className="text-gray-500">Loading editor...</span>
+                </div>
+            </div>
+        </div>
+    )
+});
 
 
 
@@ -89,6 +113,7 @@ export default function CreateCourse(){
         category: z.string().min(1, "At least one category is required"),
         tags: z.array(z.string().min(1, "Tag cannot be empty")).min(1, "At least one tag is required"),
         description: z.string().min(10),
+        richDescription: z.string().min(10, "Rich description is required"),
         thumbnail: z
         .custom<FileList>((file)=> file instanceof FileList && file.length > 0,{
             message: "Please upload an image"
@@ -111,12 +136,22 @@ export default function CreateCourse(){
         resolver: zodResolver(schema),
         defaultValues: {
             tags: [],
+            richDescription: '',
         },
     });
     
 
 
     const onSubmit = async(values: z.infer<typeof schema>) => {
+
+        // const data = {
+        //         course_name: values.title,
+        //         is_paid: isPaid,
+        //         course_description: values.description,
+        //         rich_description: values.richDescription, // Add this line
+        //         category: values.category,
+        //         ...(isPaid && { course_price: values.price })
+        // }
 
         setOpen(true);
         setModalOption('1');
@@ -176,6 +211,8 @@ export default function CreateCourse(){
             <p className="text-sm text-gray-500 mb-6"> <Link href={"/mentor/courses"}>Course Management</Link> 
                 / <strong>Create Course</strong>
             </p>
+
+
 
 
             <div className="mt-6 flex justify-end gap-4 my-2">
@@ -291,7 +328,25 @@ export default function CreateCourse(){
                         <textarea rows={9} {...register("description")} className="w-full border border-gray-300 p-2 rounded outline-none focus:border-gray-500" />
                         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                     </div>
+
+
+
                     
+
+
+                    <Controller
+                        name="richDescription"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <TipTap
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={fieldState.error?.message}
+                            />
+                        )}
+                    />
+                    
+
                 </div>
             
 

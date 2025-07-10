@@ -25,7 +25,7 @@ export default function AppLayout({children}:{children:React.ReactNode}){
 
     useEffect(() => {
         function handleResize() {
-        setWindowWidth(window.innerWidth);
+            setWindowWidth(window.innerWidth);
         }
         handleResize();
         window.addEventListener('resize', handleResize);
@@ -53,7 +53,7 @@ export default function AppLayout({children}:{children:React.ReactNode}){
                     <div className="fixed inset-0 z-30 bg-black/50 min-[700px]:hidden mt-13.5"
                         onClick={() => setIsOpen(false)}
                     />
-                )}
+                )}  
 
                 <main className={`flex-1 ${showSidebar ? 'ml-0 min-[700px]:ml-60' : 'ml-0'} transition-all duration-100`}>
                     <div className="p-4 container mx-auto">

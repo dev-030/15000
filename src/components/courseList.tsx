@@ -1,4 +1,3 @@
-import axios from "axios";
 import Link from "next/link";
 import CourseCard from "./courseCard";
 import { apiService } from "@/lib/actions/api";

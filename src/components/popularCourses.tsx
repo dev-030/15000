@@ -10,18 +10,21 @@ export default async function PopularCourses({data}:{data:any}){
 
   return(
 
-      <div className="mt-8">
+    <div className="mt-8">
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-700 pb-4">Popular Courses</h2>
+      <h2 className="text-xl font-semibold text-gray-700 mb-2">Popular Courses</h2>
+      <p className="text-gray-500 text-sm mb-5">Expand your skills with our top-rated courses</p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {data.map((course:any) => (
+           <Link href={`/courses/${course.id}`} key={course.id}>
+            <CourseCard course={course}/>
+          </Link>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
-        {data?.map((course:any) => (
-            <Link href={`/courses/${course.id}`} key={course.id}>
-              <CourseCard course={course}/>
-            </Link>
-          ))}
+      <div className="flex items-center justify-center mt-10 text-sm">
+        <Link href={"/courses"} className="bg-blue-500 text-white p-2 px-5 rounded-full text-center shadow-sm">View All Courses</Link>
       </div>
 
     </div>

@@ -98,22 +98,24 @@ export default function CreateSessionModal({ isOpen, onClose }: CreateSessionMod
       days: filteredDays,
       uploaded_thumbnail: imageBase64,
     };
+
+    console.log(data);
     
-    try {
-      const response = await CreateSession(data);
-      console.log(response)
-      if(response === 201){
-        toast.success('Session created successfully.');  
-        onClose(); 
-        mutate('/api/session-list');
-      }
-    }catch(error){
-      console.error(error);
-      toast.error('Something went wrong.');
-    }finally {
-      setIsLoading(false);
-      onClose()
-    }
+    // try {
+    //   const response = await CreateSession(data);
+    //   console.log(response)
+    //   if(response === 201){
+    //     toast.success('Session created successfully.');  
+    //     onClose(); 
+    //     mutate('/api/session-list');
+    //   }
+    // }catch(error){
+    //   console.error(error);
+    //   toast.error('Something went wrong.');
+    // }finally {
+    //   setIsLoading(false);
+    //   onClose()
+    // }
 
   };
 
@@ -228,7 +230,12 @@ export default function CreateSessionModal({ isOpen, onClose }: CreateSessionMod
                 {Object.values(daySlots).every(slots=>slots.length===0) && <div className="text-sm text-gray-500 italic">No time slots added.</div>}
               </div>
             </div>
+
+
           </div>
+
+
+
            <div className="flex justify-end mt-6 gap-2">
                 <button type="button" onClick={onClose} className="border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-100 transition-all duration-300 cursor-pointer">Cancel</button>
                 <button type="submit" disabled={isLoading} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer">

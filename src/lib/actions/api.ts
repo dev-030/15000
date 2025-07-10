@@ -58,8 +58,9 @@ class RestApi {
             headers,
         });
 
+
         if (!response.ok) {
-            console.log(response);
+            console.log(await response.json())
             throw new Error(`API Error: ${response.status} - ${response.statusText}`);
         }
 

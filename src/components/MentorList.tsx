@@ -1,9 +1,8 @@
 import { apiService } from "@/lib/actions/api";
 import Image from "next/image";
 import Link from "next/link";
+import MentorShipCard from "./MentorShipCard";
 
-
-// const InstructorCard = dynamic(() => import('@/components/instructorCard'));
 
 
 export default async function MentorList({params}:any) {
@@ -16,59 +15,17 @@ export default async function MentorList({params}:any) {
     .catch(error => {
         console.error({"ERROR":error.message});
     });
+
     
 
     return (
         <div>
             
-            <h1 className="text-xl text-gray-700 font-bold mb-4 mt-10">Book Mentors</h1>
+            <h1 className="text-lg text-gray-700 font-semibold mb-4 mt-10">Book Mentors</h1>
 
             <div className="grid grid-cols-1 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
                 {data?.map((instructor:any) => (
-                   <div key={instructor.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 w-fit transition duration-300">
-
-                        <div>
-                            <img src={instructor.thumbnail_url} alt={instructor.name} width={200} height={200} className="w-full h-[150px] object-cover" />
-                        </div>
-
-                        <div className="p-3">
-
-                            <h3 className="font-semibold text-lg text-gray-700 mb-1">
-                                {instructor.title}
-                            </h3>            
-
-                            <p className="text-gray-600 text-sm mb-3">
-                                {/* {instructor.description} */}
-                                5+ years of experience in React, Node.js, and cloud technologies. Helped 200+ students land their dream jobs.
-                            </p>
-                           
-                           
-                            <div className="flex items-center gap-10 justify-between bg-slate-50 border-[0.5px] border-gray-300 rounded-lg py-2 px-3">
-                                <div className="flex flex-col items-center gap-0.5">
-                                    <p className="text-xs text-gray-500">DURATION</p>
-                                    <p className="text-sm text-gray-700">{instructor.duration} min</p>
-                                </div>
-
-                                <div className="flex flex-col items-center gap-0.5">
-                                    <p className="text-xs text-gray-500">PRICE</p>
-                                    <p className="text-sm text-gray-700">{instructor.price}</p>
-                                </div>
-
-                                <div className="flex flex-col items-center gap-0.5">
-                                    <p className="text-xs text-gray-500">TYPE</p>
-                                    <p className="text-sm text-gray-700 text-">1-on-1</p>
-                                </div>
-                            </div>
-
-                            <Link href={`/mentors/${instructor.id}`}>
-                                <button className="bg-blue-500 text-lg w-full text-white py-2.5 rounded-lg mt-2 cursor-pointer">
-                                Book Now
-                                </button>
-                            </Link>
-
-                        </div>
-                        
-                   </div>
+                    <MentorShipCard key={instructor.id} mentor={instructor}/>
                 ))}
             </div>
 

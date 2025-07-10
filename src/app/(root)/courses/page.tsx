@@ -15,7 +15,7 @@ export default async function Courses() {
       <main className="min-h-screen">
 
         <div className="mb-5">
-          <h2 className="text-2xl font-bold text-gray-900">All Courses</h2>
+          <h2 className="text-lg font-semibold text-gray-900">All Courses</h2>
           <p className="text-gray-600 text-sm">Explore expert-led courses across various skills</p>
         </div>
 
@@ -24,9 +24,9 @@ export default async function Courses() {
           <CourseFilters searchParams={params}/>
         </Suspense> */}
 
-        {/* <Suspense fallback={<p>Loading courses…</p>}>  
-          <CourseList params={params}/>
-        </Suspense> */}
+        <Suspense fallback={<p>Loading courses…</p>}>  
+          <CourseList />
+        </Suspense>
 
 
         <div className="flex justify-center mt-12">

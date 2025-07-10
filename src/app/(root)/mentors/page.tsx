@@ -18,7 +18,7 @@ export default async function MentorsPage({searchParams}:{searchParams:any}) {
     <main className="min-h-screen">
 
       <div className="mb-5">
-        <h2 className="text-2xl font-bold text-gray-900">Mentorships</h2>
+        <h2 className="text-lg font-semibold text-gray-700">Mentorships</h2>
         <p className="text-gray-600 text-sm">Book 1:1 sessions with experts across various skills</p>
       </div>
 
@@ -26,9 +26,9 @@ export default async function MentorsPage({searchParams}:{searchParams:any}) {
         <MentorFilters searchParams={params}/>
       </Suspense> */}
 
-      <Suspense  fallback={<MentorCardsSkeleton/>}>
+      {/* <Suspense  fallback={<MentorCardsSkeleton/>}>
         <TopMentors /> 
-      </Suspense>
+      </Suspense> */}
 
 
       <Suspense fallback={<MentorCardsSkeleton/>}>

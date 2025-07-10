@@ -1,8 +1,14 @@
 'use client'
 import { BuyCourse } from "@/lib/actions/actions";
-import { ChevronDown, CirclePlay, Star, Award, BookOpen } from "lucide-react";
+import { ChevronDown, CirclePlay, Star, Award, BookOpen, Check } from "lucide-react";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
+import '@vidstack/react/player/styles/default/theme.css';
+import '@vidstack/react/player/styles/default/layouts/video.css';
+import { MediaPlayer, MediaProvider, PlayButton } from '@vidstack/react';
+import { PlyrLayout, plyrLayoutIcons } from '@vidstack/react/player/layouts/plyr';
+import '@vidstack/react/player/styles/base.css';
+import '@vidstack/react/player/styles/plyr/theme.css';
 
 export default function CourseDetails() {
     const params = useParams();
@@ -22,31 +28,96 @@ export default function CourseDetails() {
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Responsive grid: stack on mobile, 2 columns on md, 3 on lg */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Main Content */}
+                <div className="flex justify-between w-full">
+
                     <div className="md:col-span-2 space-y-8">
-                        {/* Course Header */}
+
                         <div>
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
+                            <h1 className="text-2xl sm:text-lg md:text-2xl font-bold mb-1 sm:mb-2">
                                 {courseData?.course_name}
                             </h1>
-                            <p className="text-gray-400 text-sm leading-relaxed mb-4 sm:mb-6">
-                                {courseData?.course_description}
+                            <p className="text-gray-500 text-sm mb-4 sm:mb-6">
+                                {/* {courseData?.course_description} */}
+                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Beatae expedita veniam neque, voluptatum natus consequatur alias illum quam consectetur magnam!
                             </p>
-                            {/* Rating */}
+
                             <div className="flex items-center gap-2 mb-4 sm:mb-6">
                                 <div className="flex">
                                     {[1,2,3,4,5].map((star) => (
-                                        <Star key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                        <Star key={star} className="w-4 h-4 fill-amber-400 text-amber-400" />
                                     ))}
                                 </div>
-                                <span className="text-yellow-400 text-sm">(286 ratings)</span>
+                                <span className="text-gray-600 text-sm"> 4.8 (286 ratings)</span>
                             </div>
                         </div>
 
-                        {/* Course Content */}
+                        <div>
+                            <MediaPlayer src={""} className="w-full aspect-video">
+                                <MediaProvider />
+                                <PlyrLayout icons={plyrLayoutIcons} />
+                            </MediaPlayer>
+                        </div>
+
+                        <div className="border border-gray-200 p-4 rounded-lg">
+                            <h1>What you'll learn</h1>
+
+                            <div className="grid grid-cols-2 gap-0 space-x-1 mt-2 ">
+
+                                <div className="flex items-center justify-start gap-2">
+                                    <div className="p-[1px] bg-green-500 rounded-full w-fit ">
+                                        <Check size={11} className="text-white" />
+                                    </div>
+
+                                    <p className="text-sm text-gray-700">Basics of python syntax and concepts</p>
+                                </div>
+
+                                <div className="flex items-center justify-start gap-2">
+                                    <div className="p-[1px] bg-green-500 rounded-full w-fit ">
+                                        <Check size={11} className="text-white" />
+                                    </div>
+
+                                    <p className="text-sm text-gray-700">Basics of python syntax and programming concepts</p>
+                                </div>
+
+                                <div className="flex items-center justify-start gap-2">
+                                    <div className="p-[1px] bg-green-500 rounded-full w-fit ">
+                                        <Check size={11} className="text-white" />
+                                    </div>
+
+                                    <p className="text-sm text-gray-700">Basics of python syntax and programming concepts</p>
+                                </div>
+
+
+                                <div className="flex items-center justify-start gap-2">
+                                    <div className="p-[1px] bg-green-500 rounded-full w-fit ">
+                                        <Check size={11} className="text-white" />
+                                    </div>
+
+                                    <p className="text-sm text-gray-700">Basics of python syntax and programming concepts</p>
+                                </div>
+
+
+                                <div className="flex items-center justify-start gap-2">
+                                    <div className="p-[1px] bg-green-500 rounded-full w-fit ">
+                                        <Check size={11} className="text-white" />
+                                    </div>
+
+                                    <p className="text-sm text-gray-700">Basics of python syntax and programming concepts</p>
+                                </div>
+
+                                <div className="flex items-center justify-start gap-2">
+                                    <div className="p-[1px] bg-green-500 rounded-full w-fit ">
+                                        <Check size={11} className="text-white" />
+                                    </div>
+
+                                    <p className="text-sm text-gray-700">Basics of python syntax and programming concepts</p>
+                                </div>
+
+                            </div>
+                            
+                        </div>
+
                         <div>
                             <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Course content</h2>
                             <p className="text-gray-400 text-sm mb-4 sm:mb-6">
@@ -89,6 +160,11 @@ export default function CourseDetails() {
                                     </details>
                                 ))}
                             </div>
+                        </div>
+
+                        <div>
+                            <h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Course description</h1>
+
                         </div>
 
                         {/* Instructor */}
@@ -166,7 +242,6 @@ export default function CourseDetails() {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     );
 }
