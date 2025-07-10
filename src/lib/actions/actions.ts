@@ -497,3 +497,16 @@ export async function UpdateSession(data:any){
 
   return res;
 }
+
+
+
+export async function DeleteSession(data:any){
+  const res = await apiService.delete(`/mentor/delete-gig/`, data, {
+    requiresAuth: true,
+  })
+  .catch(error => {
+    console.error("Delete error:", error);
+  })
+
+  return res;
+}

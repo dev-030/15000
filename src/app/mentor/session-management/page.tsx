@@ -64,7 +64,6 @@ export default function SessionManagement() {
               {data?.results?.map((session:any) => (
 
                 <div key={session.id} className="group w-full max-w-2xl rounded-md overflow-hidden bg-white shadow-sm transition-all duration-300 border border-gray-200">
-                                {console.log(session)}
                   <div className="relative w-full h-44 overflow-hidden">
                     <Image
                     src={session?.thumbnail_url || '/placeholder-course.jpg'}
@@ -95,10 +94,10 @@ export default function SessionManagement() {
                     </div>
 
                     <div className='flex items-center justify-between '>
-                      <button>
-                        availability
-                      </button>
-                      <Link href={`/mentor/session-management/${session.id}`} className="bg-blue-600 p-2 text-center w-full rounded-full text-white text-sm">Edit</Link>
+                      <Link href={`/mentor/session-management/${session.id}`} className="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-0 rounded-lg flex items-center justify-center cursor-pointer">
+                        <Edit size={15} className="mr-1" /> 
+                        <p className='text-sm'>Edit Session</p>
+                      </Link>
                     </div>
               
                   </div>

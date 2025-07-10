@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import useSWR, { mutate } from "swr";
 import { z } from "zod";
 import imageCompression from "browser-image-compression";
-import { CreateSession, UpdateSession } from "@/lib/actions/actions";
+import { CreateSession, DeleteSession, UpdateSession } from "@/lib/actions/actions";
 import toast, { Toaster } from 'react-hot-toast';
 
 
@@ -50,8 +50,8 @@ export default function EditSession() {
     const [amPm, setAmPm] = useState("AM");
     const [imageFile, setImageFile] = useState<{ file: File; url: string } | null>(null);
     const originalDataRef = useRef<z.infer<typeof schema> | null>(null);
-    const [loading, setLoading] = useState(false);
-
+    const [loading, setLoading] = useState<{loading:boolean, type:'save'|'delete'|'visibility'|null}>({loading: false, type: null});
+    const [isPublic, setIsPublic] = useState(true);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const params = useParams();        
     const router = useRouter();
@@ -79,10 +79,11 @@ export default function EditSession() {
     };
 
     
-    const {data, isLoading} = useSWR(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/gig-detail/?consultancy_id=${params.slug}`,
-        (url: string) => fetch(url).then((res) => res.json())
-    );    
 
+
+    const {data, isLoading} = useSWR(`/api/mentor/session-details?consultancy_id=${params.slug}`,
+        (url: string) => fetch(url).then((res) => res.json())
+    ); 
 
 
     const schema = z.object({
@@ -190,7 +191,7 @@ export default function EditSession() {
 
     const onSubmit = async(values: z.infer<typeof schema>) => {
 
-        setLoading(true);
+        setLoading({loading: true, type: 'save'});
         const original = originalDataRef.current!;
         let changedFields = getChangedFields(original, values);
 
@@ -237,77 +238,93 @@ export default function EditSession() {
             console.error(error);
             toast.error('Something went wrong.');   
         }finally {
-            mutate(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/gig-detail/?consultancy_id=${params.slug}`);
-            setLoading(false);
+            await mutate(`/api/mentor/session-details?consultancy_id=${params.slug}`);
+            setLoading({loading: false, type: null});
         }
-
-
-
-
-        // console.log('clicked')
-
-
-
-
-        // const filteredDays = Object.entries(values.timeSlots)
-        // .filter(([_, slots]) => slots.length > 0)
-        // .map(([day, slots]) => ({
-        //     day_of_week: day,
-        //     time_blocks: slots
-        // }));
-
-        // const data = {
-        //     title: values.title,
-        //     description: values.description,
-        //     rich_description: values.richDescription, 
-        //     duration: values.duration,
-        //     price: values.price,
-        //     days: filteredDays,
-        //     uploaded_thumbnail: await compressedImage(values.thumbnail[0]),
-        // }
-
-        // console.log(values.thumbnail);
-        // try {
-        //     const response = await CreateSession(data);
-        //     console.log(response)
-        //     if(response === 201){
-        //         router.push(`/mentor/session-management`);
-        //     }
-        // }catch(error){
-        //     console.error(error);
-        //     toast.error('Something went wrong.');
-        // }finally {
-
-        // }
-  
     }
+
+
+    const onDelete = async() => {
+
+        setLoading({loading: true, type: 'delete'});
+
+        try {
+            await DeleteSession({session_id: params.slug});
+            toast.error('Session deleted successfully');   
+            router.replace('/mentor/session-management');
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading({loading: false, type: null});
+        }
+    }
+
+
+    const setVisibility = async(isPublic:boolean) => {
+
+        setLoading({loading: true, type: 'visibility'});
+
+        try {
+            await UpdateSession({is_public: isPublic, session_id: params.slug});
+            toast.success(`Session set to ${isPublic ? 'public' : 'private'}`);
+        }catch(error){
+            console.error(error);
+            toast.error('Something went wrong.');   
+        }finally {
+            await mutate(`/api/mentor/session-details?consultancy_id=${params.slug}`);
+            setLoading({loading: false, type: null});
+        }
+    }
+
 
 
   return (
     <div className="p-6 max-w-7xl mx-auto bg-white">      
 
         <h2 className="text-2xl font-bold mb-6">Session Management</h2>
-        <p className="text-sm text-gray-500 mb-6"> <Link href={"/mentor/session-management"}>Session Management</Link> 
-            / <strong>Create Session</strong>
+        <p className="text-sm text-gray-500 mb-6"> 
+            <Link href={"/mentor/session-management"}>Session Management</Link> 
         </p>
 
         <Toaster/>
-        
 
         <div className="mt-6 flex justify-end gap-4 my-2">
-            <button className="px-4 py-2 font-semibold rounded hover:bg-gray-100 text-blue-500 bg-blue-50 cursor-pointer" 
-            onClick={()=>router.back()} disabled={loading}
+            <button className={`px-4 py-2 font-semibold rounded text-red-500 bg-red-50 ${loading.loading ? "":"cursor-pointer hover:bg-red-100"}`} onClick={onDelete} disabled={loading.loading}>
+                {loading.type === 'delete' ? (
+                    <div className="flex items-center gap-2">
+                        <span>Deleting</span>
+                        <div className="w-3.5 h-3.5 border-2 border-red-500 border-l-transparent rounded-full animate-spin" />
+                    </div>
+                ):("Delete")}
+            </button>
+
+            <div className={`flex items-center px-1 border border-blue-300 text-blue-500 rounded-lg min-w-[120px] ${loading.loading ? "":"cursor-pointer"}`}>
+                {loading.type === 'visibility' ? (
+                    <div className="flex items-center justify-center p-2 px-3 rounded-md w-full">
+                        <div className="w-3.5 h-3.5 border-2 border-blue-500 border-l-transparent rounded-full animate-spin" />
+                    </div>                
+                ):(
+                    <div className="flex w-full">
+                        <button className={`flex-1 py-1 px-2 rounded-md cursor-pointer text-center ${data?.is_public === true ? 'bg-blue-500 text-white' : ''}`} onClick={()=> (data.is_public === false) ? setVisibility(true): null }
+                        >Public</button>
+                        <button className={`flex-1 py-1 px-2 rounded-md cursor-pointer text-center ${data?.is_public === false ? 'bg-blue-500 text-white' : ''}`} onClick={()=> (data.is_public === true) ? setVisibility(false): null }
+                        >Private</button>
+                    </div>
+                )}
+            </div>
+
+            <button className={`px-4 py-2 font-semibold rounded hover:bg-gray-100 text-blue-500 bg-blue-50 ${loading.loading ? "":"cursor-pointer"}`} 
+            onClick={()=>router.back()} disabled={loading.loading}
             >Cancel</button>
 
-            <button className={`px-4 py-2 ${isChanged ? "bg-blue-600 cursor-pointer":"bg-blue-400"} text-white rounded `} disabled={!isChanged || loading} onClick={handleSubmit(onSubmit)}
+            <button className={`px-4 py-2 ${isChanged ? "bg-blue-600 cursor-pointer":"bg-blue-400"} text-white rounded `} disabled={!isChanged || loading.loading} onClick={handleSubmit(onSubmit)}
             >
-                {loading ? (
+                {loading.type === 'save' ? (
                     <div className="flex items-center gap-2">
                         <span>Saving</span>
                         <div className="w-3.5 h-3.5 border-2 border-white border-l-transparent rounded-full animate-spin" />
                     </div>
                 ):("Save")}
-                
             </button>
         </div>
 

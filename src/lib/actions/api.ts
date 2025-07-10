@@ -96,8 +96,8 @@ class RestApi {
         });
     }
 
-    async delete<T>(endpoint: string, options?: Omit<ApiOptions, 'method' | 'body'>): Promise<T|{status:number}> {
-        return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+    async delete<T>(endpoint: string, data?:any , options?: Omit<ApiOptions, 'method' | 'body'>): Promise<T|{status:number}> {
+        return this.request<T>(endpoint, { ...options, method: 'DELETE', body: data ? JSON.stringify(data) : undefined });
     }
 
   
