@@ -277,14 +277,14 @@ export default function EditSession() {
     }
 
 
-
+ 
   return (
     <div className="p-6 max-w-7xl mx-auto bg-white">      
 
         <h2 className="text-2xl font-bold mb-6">Session Management</h2>
         
         <p className="text-sm text-gray-500 mb-6"> 
-            <Link href={"/mentor/session-management"}>Session Management</Link> 
+            <Link href={"/mentor/session-management"}>Session Management </Link> 
         </p> 
 
         <Toaster/>
