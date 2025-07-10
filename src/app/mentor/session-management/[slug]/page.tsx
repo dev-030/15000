@@ -90,7 +90,7 @@ export default function EditSession() {
         price: z.coerce.number().min(1, 'Price must be at least 1'),
         duration: z.coerce.number().min(1, "Duration is required"),
         description: z.string().min(10),
-        richDescription: z.string().min(10, "Rich description is required"),
+        rich_description: z.string().min(10, "Rich description is required"),
         thumbnail: z
         .union([
             z
@@ -120,7 +120,7 @@ export default function EditSession() {
     const {register, unregister, handleSubmit, watch, reset, setValue, control, formState: {errors, dirtyFields}} = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
         defaultValues: {
-            richDescription: '',
+            rich_description: '',
         },
     });
 
@@ -164,7 +164,6 @@ export default function EditSession() {
     }
 
 
-
     useEffect(() => {
     if (!isLoading && data) {
         const initialValues = {
@@ -172,7 +171,7 @@ export default function EditSession() {
         price: data.price || undefined,
         duration: data.duration || '',
         description: data.description || '',
-        richDescription: data.rich_description || '',
+        rich_description: data.rich_description || '',
         thumbnail: data.thumbnail_url || '',
         timeSlots: convertBackendToForm(data.days) || [],
         };
@@ -227,6 +226,7 @@ export default function EditSession() {
             delete changedFields.timeSlots;
         }
 
+        console.log(changedFields);
         
         try {
             changedFields.session_id = params.slug as string;
@@ -571,7 +571,7 @@ export default function EditSession() {
 
 
         <Controller
-            name="richDescription"
+            name="rich_description"
             control={control}
             render={({ field, fieldState }) => (
                 <TipTap
