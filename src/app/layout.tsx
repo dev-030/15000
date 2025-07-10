@@ -28,11 +28,11 @@ export default async function RootLayout({ children}: Readonly<{children: React.
     <html lang="en"> 
       <body className={`${geistSans.className} antialiased`}>
         <SessionProvider>
-          {/* <RootLoadingScreen> */}
+          <RootLoadingScreen>
             {/* <LockScreen> */}
               {children}
             {/* </LockScreen> */}
-          {/* </RootLoadingScreen> */}
+          </RootLoadingScreen>
         </SessionProvider>
         {/* <Analytics /> */}
         {/* <SpeedInsights /> */}
