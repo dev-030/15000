@@ -387,131 +387,162 @@ export default function EditSession() {
                             const set = (newData: typeof value) => field.onChange(newData);
 
                             const addTimeSlot = () => {
-                            if (!currentTime || !activeDay) return;
-                            const [hrStr, minStr] = currentTime.split(':');
-                            let hr = parseInt(hrStr, 10);
-                            const displayHr = hr % 12 === 0 ? 12 : hr % 12;
-                            const formatted = `${displayHr}:${minStr} ${amPm}`;
-                            set({
-                                ...value,
-                                [activeDay]: [...value[activeDay], formatted],
-                            });
-                            setCurrentTime("");
+                                if (!currentTime || !activeDay) return;
+                                
+                                const [hrStr, minStr] = currentTime.split(':');
+                                let hr = parseInt(hrStr, 10);
+                                const displayHr = hr % 12 === 0 ? 12 : hr % 12;
+                                const formatted = `${displayHr}:${minStr} ${amPm}`;
+                                
+                                // Check if this time slot already exists for the active day
+                                if (value[activeDay].includes(formatted)) {
+                                    // You can show a toast/alert here instead of alert
+                                    alert(`Time slot ${formatted} already exists for ${activeDay}`);
+                                    return;
+                                }
+                                
+                                set({
+                                    ...value,
+                                    [activeDay]: [...value[activeDay], formatted],
+                                });
+                                setCurrentTime("");
                             };
 
                             const removeTimeSlot = (day: Day, index: number) => {
-                            const updated = [...value[day]];
-                            updated.splice(index, 1);
-                            set({
-                                ...value,
-                                [day]: updated,
-                            });
+                                const updated = [...value[day]];
+                                updated.splice(index, 1);
+                                set({
+                                    ...value,
+                                    [day]: updated,
+                                });
                             };
 
                             const clearDay = (day: Day) => {
-                            set({
-                                ...value,
-                                [day]: [],
-                            });
+                                set({
+                                    ...value,
+                                    [day]: [],
+                                });
+                            };
+
+                            // Helper function to check if current time already exists
+                            const isTimeSlotDuplicate = () => {
+                                if (!currentTime || !activeDay) return false;
+                                
+                                const [hrStr, minStr] = currentTime.split(':');
+                                let hr = parseInt(hrStr, 10);
+                                const displayHr = hr % 12 === 0 ? 12 : hr % 12;
+                                const formatted = `${displayHr}:${minStr} ${amPm}`;
+                                
+                                return value[activeDay].includes(formatted);
                             };
 
                             return (
-                            <div className="space-y-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Available Days</label>
-                                <div className="flex flex-wrap gap-2">
-                                {weekdays.map((day) => (
-                                    <button
-                                    key={day}
-                                    type="button"
-                                    onClick={() => toggleDay(day)}
-                                    className={`px-3 py-1 rounded border cursor-pointer ${
-                                        selectedDays.includes(day)
-                                        ? 'bg-indigo-600 text-white'
-                                        : 'bg-white border-gray-300 text-gray-700'
-                                    }`}
-                                    >
-                                    {day}
-                                    </button>
-                                ))}
-                                </div>
-
-                                {selectedDays.includes(activeDay) && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Add time for {activeDay}</label>
-                                    <div className="flex gap-2 flex-wrap">
-                                    <div className="relative">
-                                        <input
-                                        type="time"
-                                        value={currentTime}
-                                        onChange={(e) => handleTimeChange(e.target.value)}
-                                        className="border border-gray-300 rounded px-3 text-gray-700 focus:ring-1 focus:ring-indigo-500 py-2"
-                                        />
-                                    </div>
-                                    <select
-                                        value={amPm}
-                                        onChange={(e) => handlePeriodChange(e.target.value)}
-                                        className="border border-gray-300 rounded text-gray-700 px-2 py-2"
-                                    >
-                                        <option>AM</option>
-                                        <option>PM</option>
-                                    </select>
-                                    <button
-                                        type="button"
-                                        onClick={addTimeSlot}
-                                        className="bg-indigo-100 text-indigo-700 px-3 py-2 rounded flex items-center gap-1"
-                                    >
-                                        <Plus size={16} /> Add
-                                    </button>
-                                    </div>
-                                </div>
-                                )}
-
-                                <div>
-                                <label className="text-sm font-medium text-gray-700 mb-2">Time Slots</label>
-                                <div className="border border-gray-200 rounded p-4 max-h-[400px] overflow-auto">
-                                    {Object.entries(value)
-                                    .filter(([_, slots]) => slots.length > 0)
-                                    .map(([day, slots]) => (
-                                        <div key={day} className="mb-4">
-                                        <div className="flex justify-between items-center mb-1">
-                                            <h4 className="text-sm font-semibold text-indigo-600">{day}</h4>
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Available Days</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {weekdays.map((day) => (
                                             <button
-                                            type="button"
-                                            onClick={() => clearDay(day as Day)}
-                                            className="text-red-500 hover:text-red-700 text-xs"
-                                            >
-                                            Clear All
-                                            </button>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {slots.map((s, i) => (
-                                            <span
-                                                key={i}
-                                                className="flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-                                            >
-                                                {s}
-                                                <button
+                                                key={day}
                                                 type="button"
-                                                onClick={() => removeTimeSlot(day as Day, i)}
-                                                className="ml-1 text-red-500 hover:text-red-700"
+                                                onClick={() => toggleDay(day)}
+                                                className={`px-3 py-1 rounded border cursor-pointer ${
+                                                    selectedDays.includes(day)
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'bg-white border-gray-300 text-gray-700'
+                                                }`}
+                                            >
+                                                {day}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {selectedDays.includes(activeDay) && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Add time for {activeDay}</label>
+                                            <div className="flex gap-2 flex-wrap">
+                                                <div className="relative">
+                                                    <input
+                                                        type="time"
+                                                        value={currentTime}
+                                                        onChange={(e) => handleTimeChange(e.target.value)}
+                                                        className="border border-gray-300 rounded px-3 text-gray-700 focus:ring-1 focus:ring-indigo-500 py-2"
+                                                    />
+                                                </div>
+                                                <select
+                                                    value={amPm}
+                                                    onChange={(e) => handlePeriodChange(e.target.value)}
+                                                    className="border border-gray-300 rounded text-gray-700 px-2 py-2"
                                                 >
-                                                <X size={12} />
+                                                    <option>AM</option>
+                                                    <option>PM</option>
+                                                </select>
+                                                <button
+                                                    type="button"
+                                                    onClick={addTimeSlot}
+                                                    disabled={!currentTime || isTimeSlotDuplicate()}
+                                                    className={`px-3 py-2 rounded flex items-center gap-1 ${
+                                                        !currentTime || isTimeSlotDuplicate()
+                                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
+                                                    }`}
+                                                >
+                                                    <Plus size={16} /> Add
                                                 </button>
-                                            </span>
-                                            ))}
+                                            </div>
+                                            {isTimeSlotDuplicate() && currentTime && (
+                                                <p className="text-sm text-orange-600 mt-1">
+                                                    This time slot already exists for {activeDay}
+                                                </p>
+                                            )}
                                         </div>
+                                    )}
+
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-700 mb-2">Time Slots</label>
+                                        <div className="border border-gray-200 rounded p-4 max-h-[400px] overflow-auto">
+                                            {Object.entries(value)
+                                                .filter(([_, slots]) => slots.length > 0)
+                                                .map(([day, slots]) => (
+                                                    <div key={day} className="mb-4">
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <h4 className="text-sm font-semibold text-indigo-600">{day}</h4>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => clearDay(day as Day)}
+                                                                className="text-red-500 hover:text-red-700 text-xs"
+                                                            >
+                                                                Clear All
+                                                            </button>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {slots.map((s, i) => (
+                                                                <span
+                                                                    key={i}
+                                                                    className="flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                                                                >
+                                                                    {s}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeTimeSlot(day as Day, i)}
+                                                                        className="ml-1 text-red-500 hover:text-red-700"
+                                                                    >
+                                                                        <X size={12} />
+                                                                    </button>
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            {Object.values(value).every((slots) => slots.length === 0) && (
+                                                <p className="text-sm text-gray-500 italic">No time slots added.</p>
+                                            )}
                                         </div>
-                                    ))}
-                                    {Object.values(value).every((slots) => slots.length === 0) && (
-                                    <p className="text-sm text-gray-500 italic">No time slots added.</p>
+                                    </div>
+
+                                    {fieldState.error && (
+                                        <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
                                     )}
                                 </div>
-                                </div>
-
-                                {fieldState.error && (
-                                <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
-                                )}
-                            </div>
                             );
                         }}
                     />

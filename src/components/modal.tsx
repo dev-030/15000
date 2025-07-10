@@ -5,8 +5,9 @@ import { BookSchedule } from '@/lib/actions/actions';
 import { useClientSession } from '@/context/sessionProvider';
 import { ArrowRight, CalendarCheck2, CalendarDays, Check, ClockFading, Globe, Video, X } from 'lucide-react';
 import { date, z } from 'zod';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { bookingSchema } from '@/lib/schema';
+import { mutate } from 'swr';
 
 
 export function getNextWeekdayStrings( dayStrings: string | string[], countPerDay: number = 5): string[] {
@@ -93,6 +94,7 @@ function generateCalendarGrid(availableDates: string[]): Array<{ date: string | 
 export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_week: string, slug: string, time_blocks: { start_time: string }[] }[] , data:any}) {
 
 
+  const params = useParams();
   // Important : take this from the server side response
   const numberOfDaysAhead = 3;
   // ---------------------------------------------------
@@ -141,6 +143,20 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
   }, [timeSlots]);
 
 
+
+   // Helper function to check if a time slot is booked
+  const isTimeSlotBooked = (date: string, time: string): boolean => {
+    if (!data.booked_times || !Array.isArray(data.booked_times)) return false;
+    
+    // Create a datetime string in the format that matches booked_times
+    const dateTimeString = `${date}T${time}:00Z`;
+    const localDateTime = new Date(`${date} ${time}`);
+    
+    return data.booked_times.some((bookedTime: string) => {
+      const bookedDateTime = new Date(bookedTime);
+      return localDateTime.getTime() === bookedDateTime.getTime();
+    });
+  };
 
 
 
@@ -202,6 +218,10 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
   }, [open]);
 
 
+
+
+  console.log(data);
+
   return (
     <>
       {!open && (
@@ -216,7 +236,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
 
       {open && (
         user ? (
-          <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
 
             <div className="rounded-xl flex flex-col md:flex-row shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all duration-300 ease-out" onClick={e => e.stopPropagation()}>
 
@@ -227,6 +247,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
                 setSelectedDate(null);
                 setSelectedTime("");
                 setNote("");
+                router.replace(`/mentors/${params.slug}`);
               }} 
               >
                 <X size={16} />
@@ -364,23 +385,35 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
                           Available times for {dayjs(selectedDate).format('dddd, MMM D')}
                         </h4>
 
-                        <div className="max-h-50 overflow-y-auto p-0.5 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                        <div className="max-h-50 overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {getTimeBlocksForDate(selectedDate).map(slot => {
                               const isSelected = selectedTime === slot;
+                              const isBooked = isTimeSlotBooked(selectedDate, slot);
+                              
                               return (
                                 <button
                                   key={slot}
-                                  onClick={() => setSelectedTime(slot)}
+                                  onClick={() => {
+                                    if (!isBooked) {
+                                      setSelectedTime(slot);
+                                    }
+                                  }}
+                                  disabled={isBooked}
                                   className={`
-                                      text-sm p-2 rounded-md font-medium transition-all duration-200 hover:scale-105 cursor-pointer border         
-                                      ${isSelected 
-                                      ? 'text-blue-600 bg-blue-100 border-blue-400 transform scale-105' 
-                                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                    text-sm p-2 rounded-md font-medium transition-all duration-200 border relative
+                                    ${isBooked 
+                                      ? 'bg-gray-50 text-gray-400 cursor-not-allowed border-none' 
+                                      : isSelected 
+                                        ? 'text-blue-600 bg-blue-100 border-blue-400 transform scale-105 cursor-pointer hover:scale-105' 
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
                                     }
                                   `}
                                 >
                                   {formatTime12Hour(slot)}
+                                  {isBooked && (
+                                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-gray-500 rounded-full"></span>
+                                  )}                                
                                 </button>
                               );
                             })}
@@ -389,6 +422,8 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
 
                       </div>
                     )}
+
+                    
 
                     <div className="flex flex-col sm:flex-row gap-3 mt-auto">
 

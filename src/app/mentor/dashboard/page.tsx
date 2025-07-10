@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, Video, DollarSign, Star, Calendar, Clock } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -225,9 +225,24 @@ export default function Dashboard() {
       default: return 'W';
     }
   };
+
+  
+
+  useEffect(() => {
+    document.body.classList.toggle('overflow-hidden');
+    return () => { document.body.classList.remove('overflow-hidden'); };
+  }, [open]);
+  
+  
+
+  
   
   return (
-    <div className="p-6">
+    <div className="p-6 relative">
+
+      <div className='fixed inset-0 z-1 flex items-center justify-center bg-white/50 backdrop-blur-xs p-4'>
+          <h1 className='text-3xl font-semibold text-gray-800'>Coming soon...</h1>
+      </div>
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Mentor Dashboard</h1>

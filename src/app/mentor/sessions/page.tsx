@@ -74,6 +74,7 @@ export default function SessionRequests() {
   if (isLoading) return <div className="text-center py-20">Loading...</div>;
 
 
+  console.log(data);
 
   return (
     <div className="p-6 min-h-screen">

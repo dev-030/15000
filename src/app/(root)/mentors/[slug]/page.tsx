@@ -21,7 +21,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
   const mentor = data.mentor;
   const totalSlots = data.days.reduce((acc: number, day: any) => acc + day.time_blocks.length, 0);
   
-
+  
   return (
     <div className="min-h-screen py-10 sm:px-6 lg:px-8">
       <div className="w-full mx-auto flex flex-col-reverse lg:flex-row gap-4">
@@ -103,7 +103,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
         </div>
 
 
-        <div className="mt:3 md:mt-10 md:flex-3/12 z-50">
+        <div className="mt:3 md:mt-10 md:flex-3/12 z-10">
 
           <div className="bg-white md:p-6 rounded-lg border border-gray-200 sticky top-20 sm:top-24">
 
