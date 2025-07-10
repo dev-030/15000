@@ -204,6 +204,7 @@ export default function EditSession() {
             }));          
         }
 
+
         // Handle thumbnail conversion if needed
         if ('thumbnail' in changedFields) {
             if (typeof changedFields.thumbnail !== 'string') {

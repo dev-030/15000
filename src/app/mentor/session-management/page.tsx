@@ -10,6 +10,7 @@ import { SessionManagementData } from '@/lib/actions/actions';
 import useSWR from 'swr';
 import { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
+import Image from 'next/image';
 
 
 interface Session {
@@ -58,71 +59,49 @@ export default function SessionManagement() {
                   Create New Session
                 </Link>
             </div>
-          
-            <div className="flex flex-wrap gap-6">
+
+            <div className="grid grid-cols-1 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1300px]:grid-cols-4 min-[1500px]:grid-cols-5 gap-3">
               {data?.results?.map((session:any) => (
-                <div key={session.id} className="bg-white rounded-lg p-4 shadow-sm max-w-sm">
-                  <div className="flex justify-between items-start mb-4">
 
-                    <div className='w-16 h-16 rounded-full overflow-hidden'>
-                      <img src={session?.thumbnail_url} alt="" className='w-16 h-16 rounded-full object-cover' />
+                <div key={session.id} className="group w-full max-w-2xl rounded-md overflow-hidden bg-white shadow-sm transition-all duration-300 border border-gray-200">
+                                {console.log(session)}
+                  <div className="relative w-full h-44 overflow-hidden">
+                    <Image
+                    src={session?.thumbnail_url || '/placeholder-course.jpg'}
+                    alt={session?.title || 'Mentorship thumbnail'}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2IiAvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOWNhM2FmIiBmb250LXNpemU9IjE2Ij5Mb2FkaW5nLi4uPC90ZXh0Pjwvc3ZnPg=="
+                    />
+                  </div>
+              
+                  <div className="py-3 px-3 flex flex-col">
+                    <h3 className="font-semibold text-gray-800 text-md leading-tight line-clamp-2 mb-2">
+                    {session?.title}
+                    </h3>
+            
+                    <p className="text-gray-600 text-sm line-clamp-2">{session.description}</p>
+
+                    <div className="flex items-stretch gap-2 justify-between py-3 divide-x-2 divide-gray-300">
+                      <div className=" py-1.5 w-full flex flex-col gap-0.5 items-center justify-center">
+                          <p className="text-gray-500 text-xs">Duration</p>
+                          <p className="text-gray-700 text-sm">{session?.duration}</p>
+                      </div>
+                      <div className=" py-1.5 w-full flex flex-col gap-0.5 items-center justify-center">
+                          <p className="text-gray-500 text-xs">Price</p>
+                          <p className="text-gray-700 text-sm">{session?.price}</p>
+                      </div>
                     </div>
 
-
-                    <h3 className="font-medium text-lg text-gray-700">{session.title}</h3>
-
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${session.isActive ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-700'}`}>
-                        {session.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                      <button className="text-gray-500 hover:text-gray-700">
-                        <MoreVertical size={16} />
+                    <div className='flex items-center justify-between '>
+                      <button>
+                        availability
                       </button>
+                      <Link href={`/mentor/session-management/${session.id}`} className="bg-blue-600 p-2 text-center w-full rounded-full text-white text-sm">Edit</Link>
                     </div>
-
+              
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-
-                    <div>
-                      <h4 className="text-xs text-gray-600 mb-1">PRICE</h4>
-                      <div className="flex items-center">
-                        <span className="text-gray-800 text-sm">
-                          ৳ {session.price.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-xs text-gray-600 mb-1">DURATION</h4>
-                      <div className="flex items-center">
-                        <Clock size={15} className="text-gray-600 mr-1" />
-                        <span className="text-gray-800 text-sm">{session.duration} minutes</span>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  <div className="mb-4">
-                    <h4 className="text-xs text-gray-700 mb-1">DESCRIPTION</h4>
-                    <p className="text-sm text-gray-800">
-                      {session.description}
-                    </p>
-                  </div>
-
-
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 rounded-lg flex items-center justify-center cursor-pointer">
-                      <Edit size={15} className="mr-1" /> 
-                      <p className='text-sm'>Manage Availability</p>
-                    </button>
-                    <Link href={`/mentor/session-management/${session.id}`} className="flex-1 border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 px-0 rounded-lg flex items-center justify-center cursor-pointer">
-                      <Edit size={15} className="mr-1" /> 
-                      <p className='text-sm'>Edit Session</p>
-                    </Link>
-                  </div>
-
-
                 </div>
               ))}
             </div>
@@ -143,10 +122,10 @@ export default function SessionManagement() {
               Create your first session time slot to start accepting bookings from students. You can set your availability and session details.
             </p>
 
-            <button onClick={() => setIsModalOpen(true)} className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 flex items-center gap-2 cursor-pointer">
+            <Link href="/mentor/session-management/create" className="bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 flex items-center gap-2 cursor-pointer">
               <Plus className="h-5 w-5 mr-1" />
               Create New Session
-            </button>
+            </Link>
             
           </div>
         )}
