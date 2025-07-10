@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { BookSchedule } from '@/lib/actions/actions';
 import { useClientSession } from '@/context/sessionProvider';
-import { ArrowRight, CalendarDays, Check, ClockFading, Globe, Video, X } from 'lucide-react';
+import { ArrowRight, CalendarCheck2, CalendarDays, Check, ClockFading, Globe, Video, X } from 'lucide-react';
 import { date, z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { bookingSchema } from '@/lib/schema';
@@ -207,8 +207,9 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="px-4 py-2 bg-black text-white rounded cursor-pointer"
+          className="bg-blue-500 hover:bg-blue-600 flex items-center gap-2 py-2 text-lg font-medium w-full text-white rounded cursor-pointer justify-center"
         >
+          <CalendarCheck2 size={20} />
           Schedule Meeting
         </button>
       )}

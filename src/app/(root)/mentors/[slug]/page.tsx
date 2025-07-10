@@ -23,16 +23,16 @@ export default async function MentorSessionDetails({ params }: { params: Promise
   
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+    <div className="min-h-screen py-10 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto flex flex-col-reverse lg:flex-row gap-4">
 
-        {/* LEFT */}
-        <div className="flex-grow lg:w-2/3 bg-white p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{data.title}</h1>
-          <p className="mb-5 text-gray-700">{data?.description}</p>
+
+        <div className="flex-grow lg:w-2/3 bg-white p-0 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 hidden md:block">{data.title}</h1>
+          <p className="mb-5 text-gray-700 hidden md:block">{data?.description}</p>
 
           {/* Mentor Info */}
-          <div className='flex items-center gap-3 mb-6'>
+          <div className='hidden md:flex items-center gap-3 mb-6'>
             <img
               src={mentor?.profile_pic || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'}
               className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover"
@@ -50,11 +50,11 @@ export default async function MentorSessionDetails({ params }: { params: Promise
           <img
             src={data?.thumbnail_url}
             alt={data.title}
-            className='w-full h-48 sm:h-[30rem] object-cover rounded-lg'
+            className='w-full h-48 sm:h-[30rem] object-cover rounded-lg hidden md:block'
           />
 
 
-          <div className="border border-gray-200 rounded-md p-5 my-3">
+          <div className="md:border border-gray-200 rounded-md md:p-5 my-3">
             <h1 className="text-xl text-gray-800 font-semibold pb-3">Session Description</h1>
             <div className="prose">
               {parse(data?.rich_description)}
@@ -103,22 +103,51 @@ export default async function MentorSessionDetails({ params }: { params: Promise
         </div>
 
 
-        
+        <div className="mt:3 md:mt-10 md:flex-3/12 z-50">
 
-        <div className="lg:w-1/3 w-full z-10">
-          <div className="bg-white p-6 rounded-lg shadow-md sticky top-20 sm:top-24">
-            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Book Your Session</h3>
+          <div className="bg-white md:p-6 rounded-lg border border-gray-200 sticky top-20 sm:top-24">
 
-            <div className="text-left text-sm sm:text-base mb-6 space-y-1 text-gray-700">
-              <p><strong className="text-lg sm:text-xl">৳{data.price}</strong> per session</p>
-              <p><span className="font-medium">Duration:</span> {data.duration} mins</p>
-              <p><span className="font-medium">Weekly Availability:</span> {data.days.length} days</p>
+            <h3 className="text-xl hidden md:block sm:text-xl text-center font-semibold text-gray-800 mb-4">Book This Session</h3>
+
+            <img
+              src={data?.thumbnail_url}
+              alt={data.title}
+              className='w-full h-5/6 object-cover rounded-lg md:hidden'
+            />
+
+            <div className="p-4">
+
+              <h1 className="text-xl font-bold text-gray-800 mb-2 md:hidden mt-2">{data.title}</h1>
+              <p className="mb-3 text-gray-700 md:hidden">{data?.description}</p>
+
+              <div className="text-left text-sm sm:text-base mb-6 text-gray-700 divide-y-2 divide-gray-400 md:pt-7">
+                <div className="flex items-center justify-between py-3">
+                  <p>Price</p>
+                  <p>{data.price} tk</p>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <p>Duration</p>
+                  <p>{data.duration} min</p>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <p>Session Type</p>
+                  <p>1-on-1</p>
+                </div>
+              </div>
+
+              <div className="w-full">
+                <BookingModal timeSlots={data.days} data={data} />
+              </div>
+
             </div>
+            
 
-            <BookingModal timeSlots={data.days} data={data} />
 
           </div>
+
         </div>
+
+
 
         
       </div>
