@@ -202,8 +202,6 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
   }, [open]);
 
 
-  console.log(data);
-
   return (
     <>
       {!open && (

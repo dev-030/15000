@@ -1,6 +1,6 @@
 import BookingModal from "@/components/modal";
 import { apiService } from '@/lib/actions/api';
-import { Star } from "lucide-react";
+import { MessageSquareMore, Star } from "lucide-react";
 import parse from 'html-react-parser';
 
 
@@ -27,7 +27,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
         {/* LEFT */}
-        <div className="flex-grow lg:w-2/3 bg-white rounded-lg shadow-sm p-6 sm:p-8">
+        <div className="flex-grow lg:w-2/3 bg-white p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{data.title}</h1>
           <p className="mb-5 text-gray-700">{data?.description}</p>
 
@@ -77,10 +77,35 @@ export default async function MentorSessionDetails({ params }: { params: Promise
               </div>
             </div>
           </div>
+
+          <div className="rounded-lg border border-slate-200 p-4 sm:p-6 mt-4">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Student reviews</h2>
+                <p className="text-gray-600">See what our students are saying about this session.</p>
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm text-gray-700 flex items-center gap-2">
+                  <Star size={14} className="text-yellow-500" />
+                  {mentor.rating || '0.00'} (0 reviews)
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-center gap-7 pt-20">
+              <MessageSquareMore size={80} className="text-gray-400" />
+              <div className="text-center space-y-2">
+                <p className="text-gray-700 text-sm">No reviews yet for this session.</p>
+                <p className="text-gray-700 text-sm">Be the first to leave feedback after attending!</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
 
-        <div className="lg:w-1/3 w-full z-50">
+        
+
+        <div className="lg:w-1/3 w-full z-10">
           <div className="bg-white p-6 rounded-lg shadow-md sticky top-20 sm:top-24">
             <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Book Your Session</h3>
 
@@ -94,13 +119,10 @@ export default async function MentorSessionDetails({ params }: { params: Promise
 
           </div>
         </div>
+
+        
       </div>
 
-      {/* Similar Sessions */}
-      <div className="mt-12 bg-white p-6 rounded-lg shadow-sm max-w-7xl mx-auto">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">Similar Sessions</h2>
-        <p className="text-sm sm:text-base text-gray-500">More personalized sessions will be shown here based on category and rating.</p>
-      </div>
     </div>
   );
 }
