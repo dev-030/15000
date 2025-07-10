@@ -22,6 +22,8 @@ export default async function MyCoursesComponent(){
         console.error({"ERROR":error.message});
     })
 
+    console.log(data);
+
       
   return(
     <div>

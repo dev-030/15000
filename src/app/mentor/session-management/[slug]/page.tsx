@@ -289,7 +289,7 @@ export default function EditSession() {
 
         <Toaster/>
 
-        <div className="mt-6 flex justify-end gap-4 my-2">
+        <div className="mt-6 flex flex-wrap justify-end gap-4 my-2">
             <button className={`px-4 py-2 font-semibold rounded text-red-500 bg-red-50 ${loading.loading ? "":"cursor-pointer hover:bg-red-100"}`} onClick={onDelete} disabled={loading.loading}>
                 {loading.type === 'delete' ? (
                     <div className="flex items-center gap-2">
@@ -618,19 +618,24 @@ export default function EditSession() {
                 
             </div>
         </div>
+        
+
+        
+        <div className="pt-3">
+            <Controller
+                name="rich_description"
+                control={control}
+                render={({ field, fieldState }) => (
+                    <TipTap
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={fieldState.error?.message}
+                    />
+                )}
+            />
+        </div>
 
 
-        <Controller
-            name="rich_description"
-            control={control}
-            render={({ field, fieldState }) => (
-                <TipTap
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={fieldState.error?.message}
-                />
-            )}
-        />
       
     </div>
   )

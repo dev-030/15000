@@ -17,7 +17,7 @@ export default function TipTap({ value = '', onChange, placeholder = 'Start typi
             Paragraph,
             Text,
             Blockquote.configure({
-                HTMLAttributes: { class: "border-l-4 border-gray-500 bg-gray-100 p-2 ml-3" },
+                HTMLAttributes: { class: "border-l-4 border-gray-500 bg-gray-100 p-2 ml-3 " },
             })
         ],
         content: value,
@@ -72,7 +72,7 @@ export default function TipTap({ value = '', onChange, placeholder = 'Start typi
     return(
         <div className="flex flex-col gap-1">
             <label className="font-medium text-gray-800">Course Description</label>
-            <div className="border border-gray-300 rounded-md p-4">
+            <div className="border border-gray-300 rounded-md p-4 w-full">
                 <div className="control-group mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
                         <button 
@@ -125,7 +125,7 @@ export default function TipTap({ value = '', onChange, placeholder = 'Start typi
                 <EditorContent 
                     editor={editor} 
                     tabIndex={0} 
-                    className="prose min-h-[120px] bg-white p-4 border border-gray-200 focus-within:border-gray-500 transition-colors duration-200 rounded-md outline-none focus:border-gray-500"
+                    className="prose min-h-[120px] p-4 border bg-gray-50 border-gray-200 focus-within:border-gray-500 transition-colors duration-200 rounded-md outline-none focus:border-gray-500"
                 />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}

@@ -31,7 +31,7 @@ export default async function Home() {
       
       <HomeBanner/>
 
-      <PopularCourses data={data?.courses}/>
+      {/* <PopularCourses data={data?.courses}/> */}
 
       {/* <div className="bg-slate-50 rounded-lg py-9 my-10">
         <TopMentors/>

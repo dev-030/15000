@@ -37,15 +37,10 @@ export default function MyCourseCard({course}:{course:any}){
             <h3 className="mt-2 text-md font-semibold">
                 {course.course_name}
             </h3>
-            <p className="text-sm text-gray-600 pt-2">By {course.mentor_name}</p>
-            <div className="mt-2 text-sm text-gray-500">
-                {course.status === 'Completed' && course.completedAt && (
-                <p>Completed: {course.completedAt}</p>
-                )}
-                {course.status !== 'Completed' && course.lastAccessed && (
-                <p>Last accessed: {course.lastAccessed}</p>
-                )}
-            </div>
+            <p className="text-sm text-gray-600 pt-1">By {course.mentor_name}</p>
+
+            <p className="mt-2 text-gray-700 text-sm line-clamp-2">{course.course_description}</p>
+
             <div className="mt-2">
                 <div className="bg-gray-200 h-2 rounded-full">
                 <div

@@ -18,9 +18,9 @@ type LinkItem = {
 
 const links: LinkItem[] = [
     { name: "Home", href: "/", icon: House },
-    { name: "Courses", href: "/courses", icon: BookText },
+    // { name: "Courses", href: "/courses", icon: BookText },
     { name: "Mentorships", href: "/mentors", icon: GraduationCap },
-    { name: "My Courses", href: "/my-courses", icon: MonitorPlay },
+    // { name: "My Courses", href: "/my-courses", icon: MonitorPlay },
     { name: "Booked Sessions", href: "/sessions", icon: CalendarCheck },
     { name: "Saved", href: "/saved", icon: Bookmark },
     { name: "Become a Mentor", href: "/onboarding", icon: SquareUserRound, requiresAuth: true }
@@ -44,7 +44,7 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
 
             <div>
                 <nav className="flex flex-col gap-2">
-                {visibleLinks.slice(0, 3).map((link) => (
+                {visibleLinks.slice(0, 2).map((link) => (
                     <Link
                     onClick={() => setState(!state)}
                     key={link.name}
@@ -63,7 +63,7 @@ export default function RootSideBar({state, setState}:{state:boolean, setState:R
 
                 <hr className="my-2 border-gray-300" />
 
-                {visibleLinks.slice(3).map((link) => (
+                {visibleLinks.slice(2).map((link) => (
                     <Link
                     onClick={() => setState(!state)}
                     key={link.name}

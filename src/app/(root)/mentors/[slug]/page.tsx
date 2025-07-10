@@ -2,6 +2,7 @@ import BookingModal from "@/components/modal";
 import { apiService } from '@/lib/actions/api';
 import { MessageSquareMore, Star } from "lucide-react";
 import parse from 'html-react-parser';
+import Link from "next/link";
 
 
 export default async function MentorSessionDetails({ params }: { params: Promise<{ slug: string }> }) {
@@ -71,7 +72,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
                 alt="Mentor"
               />
               <div className="text-center sm:text-left">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">{mentor?.full_name}</h3>
+                <Link href={`/profile/${mentor?.username}`} className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 hover:cursor-pointer">{mentor?.full_name}</Link>
                 <p className="text-gray-600 text-sm sm:text-base">{mentor?.about || "This mentor hasn't added a bio yet."}</p>
                 <p className="text-xs sm:text-sm text-gray-500 mt-2">Avg. Response Time: {mentor.response_time || 'N/A'}</p>
               </div>

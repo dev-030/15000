@@ -36,7 +36,7 @@ export default async function MentorsPage({searchParams}:{searchParams:any}) {
       </Suspense>
 
 
-      <div className="flex justify-center mt-12">
+      {/* <div className="flex justify-center mt-12">
         <nav className="flex items-center gap-1">
           <button className="border border-gray-300 rounded-md p-2 hover:bg-gray-100">
             <ChevronLeft className="h-4 w-4" />
@@ -58,10 +58,10 @@ export default async function MentorsPage({searchParams}:{searchParams:any}) {
             <ChevronRight className="h-4 w-4" />
           </button>
         </nav>
-      </div>
+      </div> */}
       
 
-      <div className="mt-14 bg-blue-500 rounded-lg px-4 py-2 text-white flex justify-between items-center">
+      {/* <div className="mt-14 bg-blue-500 rounded-lg px-4 py-2 text-white flex justify-between items-center">
         <div>
           <h3 className="font-medium text-sm mb-1">Become a Mentor</h3>
           <p className="text-xs text-indigo-100">Share your expertise, help others grow, and earn additional income!</p>
@@ -69,7 +69,7 @@ export default async function MentorsPage({searchParams}:{searchParams:any}) {
         <Link href="/onboarding" className="bg-white text-blue-600 hover:bg-gray-100 text-xs font-medium py-2 px-4 rounded">
           Apply Now
         </Link>
-      </div>
+      </div> */}
 
     </main>
   );
