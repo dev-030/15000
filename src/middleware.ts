@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
 
 
   // 2. Mentor route protection
-   if (pathname.startsWith('/mentor')) {
+  if (/^\/mentor(\/|$)/.test(pathname)) {
 
     if (!accessToken) {
       return NextResponse.redirect(new URL('/', request.url));

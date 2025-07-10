@@ -25,6 +25,7 @@ export default function BookedSessions(){
         }
     );
     
+    console.log(data?.results);
 
     return (
         <div>

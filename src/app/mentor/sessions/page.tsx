@@ -38,6 +38,8 @@ export default function SessionRequests() {
 
 
 
+  console.log(data);
+
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -87,7 +89,7 @@ export default function SessionRequests() {
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                   <div className="h-12 w-12 relative">
                     <img
-                      src={session.consultancy.thumbnail_url}
+                      src={session?.consultancy?.thumbnail_url}
                       alt="mentor"
                       className="rounded-full object-cover w-full h-full"
                     />
