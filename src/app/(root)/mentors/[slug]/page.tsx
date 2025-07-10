@@ -23,12 +23,13 @@ export default async function MentorSessionDetails({ params }: { params: Promise
   
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
         {/* LEFT */}
         <div className="flex-grow lg:w-2/3 bg-white rounded-lg shadow-sm p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">{data.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{data.title}</h1>
+          <p className="mb-5 text-gray-700">{data?.description}</p>
 
           {/* Mentor Info */}
           <div className='flex items-center gap-3 mb-6'>
@@ -38,7 +39,7 @@ export default async function MentorSessionDetails({ params }: { params: Promise
               alt="Mentor"
             />
             <div>
-              <h2 className="text-base sm:text-lg font-medium text-gray-700">@{mentor.username}</h2>
+              <h2 className="text-base sm:text-lg font-medium text-gray-700">{mentor?.full_name}</h2>
               <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-2">
                 <Star size={14} className="text-yellow-400" />
                 {mentor.rating || '0.00'} Instructor Rating
@@ -49,34 +50,29 @@ export default async function MentorSessionDetails({ params }: { params: Promise
           <img
             src={data?.thumbnail_url}
             alt={data.title}
-            className='w-full h-48 sm:h-72 object-cover rounded-lg mb-6'
+            className='w-full h-48 sm:h-[30rem] object-cover rounded-lg'
           />
 
-          {/* Description */}
-          <p className="text-gray-700 leading-relaxed mb-6 text-sm sm:text-base">
-            {data.description}
-          </p>
 
-
-          <div>
-            {
-              parse(data?.rich_description)
-            }
+          <div className="border border-gray-200 rounded-md p-5 my-3">
+            <h1 className="text-xl text-gray-800 font-semibold pb-3">Session Description</h1>
+            <div className="prose">
+              {parse(data?.rich_description)}
+            </div>
           </div>
 
 
-          {/* Instructor Info Block */}
           <div className="bg-gray-50 rounded-lg border border-slate-200 p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">About the Instructor</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-6">About the Instructor</h2>
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
               <img
                 src={mentor?.profile_pic || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'}
-                className="h-24 w-24 rounded-full object-cover border"
+                className="h-24 w-24 rounded-full object-cover border border-gray-300"
                 alt="Mentor"
               />
               <div className="text-center sm:text-left">
-                <h3 className="text-lg sm:text-xl font-semibold text-blue-600 mb-2">@{mentor.username}</h3>
-                <p className="text-gray-600 text-sm sm:text-base">{mentor.about || "This mentor hasn't added a bio yet."}</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">{mentor?.full_name}</h3>
+                <p className="text-gray-600 text-sm sm:text-base">{mentor?.about || "This mentor hasn't added a bio yet."}</p>
                 <p className="text-xs sm:text-sm text-gray-500 mt-2">Avg. Response Time: {mentor.response_time || 'N/A'}</p>
               </div>
             </div>

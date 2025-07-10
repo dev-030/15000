@@ -59,7 +59,7 @@ export async function BookSchedule({selectedDate, selectedTime, slug, note}:{sel
   const cookie = (await cookies()).get("access_token")?.value;
 
   const result = bookingSchema.safeParse({ 
-    date: selectedDate,
+    date: selectedDate, 
     time: selectedTime,
     slug: slug,
     note: note
@@ -72,7 +72,7 @@ export async function BookSchedule({selectedDate, selectedTime, slug, note}:{sel
     };
   }
 
-  await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/book-consultancy/`,{
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/client/book-consultancy/`,{
     method: 'POST',
     body: JSON.stringify({
       "consultancy_id": slug,
@@ -85,6 +85,8 @@ export async function BookSchedule({selectedDate, selectedTime, slug, note}:{sel
       "Authorization": `Bearer ${cookie}`,
     },
   }).then((res) => res.json());
+
+  console.log(res);
 
 }
 

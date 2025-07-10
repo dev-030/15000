@@ -171,7 +171,8 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
       return;
     }
 
-    BookSchedule({ selectedDate, selectedTime, slug: data.id, note }).then(() => {
+    BookSchedule({ selectedDate, selectedTime, slug: data.id, note }).then((res) => {
+      console.log(res);
       setStep("confirmed");
     }).catch((error) => {
       console.error(error);
@@ -297,7 +298,6 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
               <div className="w-full md:w-3/5 p-5 bg-white flex flex-col">
                 {step === "select" && (
                   <>
-
                     {/* Calendar UI */}
                     <div className="mb-5">
                       <div className="flex items-center gap-2 mb-3">
@@ -365,7 +365,7 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
                           Available times for {dayjs(selectedDate).format('dddd, MMM D')}
                         </h4>
 
-                        <div className="max-h-50 overflow-y-auto">
+                        <div className="max-h-50 overflow-y-auto p-0.5 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {getTimeBlocksForDate(selectedDate).map(slot => {
                               const isSelected = selectedTime === slot;
@@ -374,8 +374,8 @@ export default function BookingModal({ timeSlots, data }: { timeSlots: { day_of_
                                   key={slot}
                                   onClick={() => setSelectedTime(slot)}
                                   className={`
-                                    text-sm p-2 rounded-md font-medium transition-all duration-200 hover:scale-105 cursor-pointer border
-                                    ${isSelected 
+                                      text-sm p-2 rounded-md font-medium transition-all duration-200 hover:scale-105 cursor-pointer border         
+                                      ${isSelected 
                                       ? 'text-blue-600 bg-blue-100 border-blue-400 transform scale-105' 
                                       : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
                                     }
